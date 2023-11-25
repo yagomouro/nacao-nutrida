@@ -1,0 +1,250 @@
+.pg_index {
+    .section {
+        height: calc(100vh - 13rem);
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+
+
+        .wrapper {
+            width: min-content;
+            max-width: 120rem;
+            height: max-content;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        &.arrecade {
+            height: calc(95vh - 8rem);
+            background-color: var(--white);
+            padding-bottom: 8rem;
+
+            .wrapper.arrecade {
+                gap: 6rem;
+
+                .wrapper-cta {
+                    height: 100%;
+                    width: 60%;
+
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    align-items: flex-start;
+
+                    .column {
+                        gap: 2rem;
+                    }
+
+                    .buttons {
+                        width: 100%;
+                        margin-top: 2rem;
+
+                        justify-content: flex-start;
+                        gap: 1rem;
+                    }
+                }
+            }
+
+            .wrapper-svg {
+                img {
+                    width: 60rem;
+                }
+            }
+
+            
+        
+            // &::after{
+            //     content: url("/assets/img/icone_dbl_down_blue.svg");
+            //     display:block;
+            //     position: absolute;
+
+            //     top: 90vh;
+            //     transform: translateY(-3rem);
+            //     opacity: 1;
+
+            //     animation: index ease-in-out 1s infinite alternate;
+
+            //     @keyframes index{
+            //         from{
+            //             opacity: 1;
+            //             transform: translateY(-3rem);
+            //         }
+                    
+            //         to{
+            //             transform: translateY(0rem);
+            //             opacity: 0;
+            //         }
+            //     }
+            // }
+
+        }
+
+        &.pratique {
+            background-color: var(--gray-background);
+
+            .wrapper.pratique {
+                gap: 5rem;
+
+                .wrapper-image {
+                    display: flex;
+
+                    img {
+                        width: 32rem;
+                        border-radius: 2rem;
+                    }
+                }
+
+                .wrapper-text {
+                    height: 100%;
+                    width: max-content;
+
+                    display: flex;
+                    gap: 2rem;
+                }
+            }
+        }
+
+        &.processos {
+            flex-direction: column;
+            color: white;
+
+            &.acoes {
+                background-color: var(--blue-light2);
+                
+                // &::after{
+                //     content: url("/assets/img/icone_dbl_down.svg");
+                //     display:block;
+                //     position: relative;
+    
+                //     top: 22%;
+                //     transform: translateY(-3rem);
+                //     opacity: 1;
+    
+                //     animation: index ease-in-out 1s infinite alternate;
+    
+                //     @keyframes index{
+                //         from{
+                //             opacity: 1;
+                //             transform: translateY(-3rem);
+                //         }
+                        
+                //         to{
+                //             transform: translateY(0rem);
+                //             opacity: 0;
+                //         }
+                //     }
+                // }
+            }
+
+            &.doadores {
+                background-color: var(--blue-logo);
+            }
+
+            .wrapper {
+                .titulo {
+                    margin-bottom: 8rem;
+                }
+
+                .wrapper-processos {
+                    gap: 2rem;
+                    align-items: flex-start;
+
+                    .processo {
+                        width: 25rem;
+
+                        justify-content: center;
+                        align-items: center;
+                        gap: 2rem;
+
+                        &:not(:last-child):after {
+                            // content: url("/assets/img/arrow-right.svg");
+                            position: relative;
+                            left: 50%;
+                            top: -15rem;
+                        }
+
+                        .svg-processo {
+                            height: 10rem;
+                        }
+
+                        .titulo-descricao {
+                            font-size: 2rem;
+                            font-weight: 500;
+
+                            color: var(--white);
+
+                            text-align: center;
+                        }
+                    }
+                }
+            }
+        }
+
+        .depoContainer {
+            gap: 4rem;
+        }
+
+        &.depoimentos {
+            background-color: var (--gray-background);
+
+            .titulo-depoimento {
+                font-size: 4rem;
+                font-weight: bold;
+
+                line-height: 101.8%;
+                margin-bottom: 7rem;
+            }
+
+            .wrapper-depoimento {
+                width: 96rem;
+
+                flex-wrap: wrap;
+                gap: 5rem;
+            }
+
+            .depoimento {
+                width: 70%;
+                margin-right: 2rem;
+                gap: 3rem;
+                align-items: flex-start;
+
+                img {
+                    height: 15rem;
+                    width: 15rem;
+                    border-radius: 1rem;
+                }
+
+                .texto-depoimento {
+                    font-size: 1.8rem;
+                    font-weight: 400;
+
+                    width: 25rem;
+
+                    line-height: 150%;
+                    text-align: justify;
+
+                    h4 {
+                        font-weight: 600;
+                        margin-top: 1rem;
+                    }
+
+                    .nome-depoimento {
+                        color: var(--black-logo);
+                        margin-bottom: 1rem;
+                        font-size: 2.5rem;
+                        font-weight: bold;
+                    }
+
+                    .desc-depoimento {
+                        color: var(--gray-minor-font);
+                        line-height: 165%;
+                    }
+                }
+            }
+        }
+    }
+}
