@@ -1,25 +1,28 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+
+import { Home } from './pages/Home'
+import { NotFound } from './pages/NotFound';
+import { Descobrir } from './pages/Descobrir';
+import { Campanha } from './pages/Campanha';
+import { Login } from './pages/Login';
+import { Cadastro } from './pages/Cadastro';
+
+import './styles/main.scss'
+import { CriacaoCampanha } from './pages/CadastroCampanha';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Projeto pi DSM em React 
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path='/' element={<Home />} />
+        <Route path='/login' element={<Login />} />
+        <Route path='/cadastro' element={<Cadastro />} />
+        <Route path='/descobrir' element={<Descobrir />} />
+        <Route path='/campanhas/:cd_campanha' element={<Campanha />} />
+        <Route path='/campanhas/criar' element={<CriacaoCampanha />} />
+        <Route path='*' element={<NotFound />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
