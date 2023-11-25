@@ -1,9 +1,7 @@
-import { Footer } from '../../components/Footer'
 import { Navbar } from '../../components/Navbar'
 
 import { Link, useNavigate } from 'react-router-dom';
 
-import campanhas from '../../data/campanhas.json'
 import { useState } from 'react';
 
 export const Login = () => {
