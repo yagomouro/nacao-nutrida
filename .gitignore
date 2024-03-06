@@ -42,6 +42,7 @@ build/Release
 
 # dependencies
 /node_modules
+*/node_modules
 /.pnp
 .pnp.js
 
@@ -149,3 +150,14 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# Local Netlify folder
+.netlify
+
+# old styles
+*/styles/pages/_chat.scss
+*/styles/pages/_informacoes.scss
+*/styles/pages/_relatorio.scss
+*/styles/layout/_notificacoes.scss
+*/styles/layout/_painel.scss
+*/styles/main_old.scss
