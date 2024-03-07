@@ -1,24 +1,54 @@
+import { useEffect, useState } from 'react';
+import axios from 'axios';
 import { Footer } from '../../components/Footer'
 import { Navbar } from '../../components/Navbar'
 
 import { Link } from 'react-router-dom';
+import { ICampanhaAlimento } from '../../types/ICampanha';
 
-import campanhas from '../../data/campanhas.json'
 
 export const Descobrir = () => {
+  const [campanhas, setCampanhas] = useState<ICampanhaAlimento[]>([])
+
+  const url = '/api/campanhas'
+
+  useEffect(() => {
+    axios.get(url).then((response) => {
+      setCampanhas(response.data)
+    }).catch((err) => {
+      console.log('Error: ' + err)
+    })
+  }, [])
+
 
   function contarProgresso(qt_doacoes_campanha: number, qt_total_campanha: number) {
-    let percentage = (qt_doacoes_campanha * 100) / qt_total_campanha
+    let percentage = Math.floor((qt_doacoes_campanha * 100) / qt_total_campanha)
 
     if (percentage > 100) {
       return `100%`
     } else {
       return `${percentage}%`
     }
+  }
 
+  function contarTempoRestante(anos: number, meses: number, dias: number, horas: number, minutos: number) {
+    if (anos > 0) {
+      return `Expira em: ${anos} anos`
+    } else if (meses > 0) {
+      return `Expira em: ${meses} meses`
+    } else if (dias > 0) {
+      return `Expira em: ${dias} dias`
+    } else if (horas > 0) {
+      return `Expira em: ${horas} horas`
+    } else if (minutos > 0) {
+      return `Expira em: ${minutos} minutos`
+    } else {
+      return 'Campanha encerrada'
+    }
   }
 
   return (
+    campanhas && 
     <>
       <Navbar user={{ 'cd_foto_usuario': '1', 'nm_usuario': 'Usuário 1' }} />
       <main className="pg_descobrir">
@@ -26,7 +56,7 @@ export const Descobrir = () => {
         <div className="background">
           <form className="filtro-campanhas column" action="/descobrir/" method="GET">
             <h1 className="titulo white">Insira o estado e a cidade</h1>
-            <h2 className="sub titulo white">Encontre eventos de combate à fome perto de você</h2>
+            <h2 className="sub titulo white">Encontre campanhas de combate à fome perto de você</h2>
             <div className="row">
               <select name="estado" className="input-form" id="estadoPed">
                 <option value="0">Selecione o Estado</option>
@@ -50,7 +80,7 @@ export const Descobrir = () => {
               <Link key={campanha.cd_campanha} className="campanha-link" to={`/campanhas/${campanha.cd_campanha}`}>
                 <div className="campanha">
                   <div className="imagem-campanha">
-                    <img src={`/assets/campanhas/${campanha.cd_imagem_campanha}.png`} alt="" />
+                    <img src={`/assets/campanhas/${campanha.cd_imagem_campanha}`} alt="" />
                   </div>
 
                   <div className="informacoes-campanha column">
@@ -86,12 +116,12 @@ export const Descobrir = () => {
                       <div className="row">
                         <div className="usuario row">
                           <div className="img-wrapper">
-                            <img src={`/assets/profile/${campanha.cd_foto_usuario}.png`} alt="Foto do usuário" />
+                            <img src={`/assets/profile/${campanha.cd_foto_usuario}`} alt="Foto do usuário" />
                           </div>
                           <div className="column">
                             <h2 className="nomeUsuario">{campanha.nm_usuario}</h2>
                             <p className="titulo-gray cidadeEstado">
-                              {campanha.nm_cidade_usuario}, {campanha.sg_estado_usuario}
+                              {campanha.nm_cidade_campanha}, {campanha.sg_estado_campanha}
                             </p>
                           </div>
                         </div>
@@ -99,7 +129,7 @@ export const Descobrir = () => {
                         <div className="column">
                           <div>
                             <img className="svg-campanha" src="/assets/img/icone_relogio.svg" alt="Icone relógio" />
-                            <p className="expiraEm">Expira em: {campanha.qt_tempo_restante}</p>
+                            <p className="expiraEm">{contarTempoRestante(campanha.anos_restantes, campanha.meses_restantes, campanha.dias_restantes, campanha.horas_restantes, campanha.minutos_restantes)}</p>
                           </div>
 
                           <div>
@@ -132,5 +162,6 @@ export const Descobrir = () => {
 
       <Footer></Footer>
     </>
+
   );
 };

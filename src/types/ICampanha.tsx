@@ -1,3 +1,11 @@
+export interface IAlimento {
+    nm_alimento: string;
+    cd_campanha_alimento: number;
+    nm_medida_alimento: string;
+    qt_alimento: number;
+    qt_doada_alimento: number;
+}
+
 export interface ICampanha {
     cd_campanha: number;
     cd_usuario_campanha: number;
@@ -11,4 +19,15 @@ export interface ICampanha {
     qt_total_campanha: number;
     cd_imagem_campanha: string;
     qt_doacoes_campanha: number;
+    minutos_restantes: number,
+	horas_restantes: number,
+    dias_restantes: number,
+    meses_restantes: number,
+    anos_restantes: number,
+}
+
+export interface ICampanhaAlimento extends ICampanha{
+    nm_usuario: string;
+    cd_foto_usuario: string;
+    alimentos: IAlimento[]
 }

@@ -1,19 +1,29 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 
 import { Footer } from '../../components/Footer'
 import { Navbar } from '../../components/Navbar'
 
-import campanhas from '../../data/campanhas.json'
+import axios from 'axios'
 
-import { ICampanha } from '../../types/ICampanha';
+import { ICampanhaAlimento } from '../../types/ICampanha';
 
 
 export const Campanha = () => {
   const navigate = useNavigate()
+  const [campanha, setCampanha] = useState<ICampanhaAlimento[]>([])
+
   const { cd_campanha } = useParams();
 
-  const campanha: ICampanha = campanhas.find(item => item.cd_campanha == cd_campanha)!
+  const url = `/api/campanhas?id=${cd_campanha}`
+
+  useEffect(() => {
+    axios.get<ICampanhaAlimento[]>(url).then((response) => {
+      setCampanha(response.data)
+    }).catch((err) => {
+      console.log('Error: ' + err)
+    })
+  }, [])
 
   const [modalVisible, setModalVisible] = useState(false);
 
@@ -27,7 +37,7 @@ export const Campanha = () => {
   };
 
   function contarProgresso(qt_doacoes_campanha: number, qt_total_campanha: number) {
-    let percentage = (qt_doacoes_campanha * 100) / qt_total_campanha
+    let percentage = Math.floor((qt_doacoes_campanha * 100) / qt_total_campanha)
 
     if (percentage > 100) {
       return `100%`
@@ -37,7 +47,25 @@ export const Campanha = () => {
 
   }
 
+  function contarTempoRestante(anos: number, meses: number, dias: number, horas: number, minutos: number) {
+    if (anos > 0) {
+      return `Expira em: ${anos} anos`
+    } else if (meses > 0) {
+      return `Expira em: ${meses} meses`
+    } else if (dias > 0) {
+      return `Expira em: ${dias} dias`
+    } else if (horas > 0) {
+      return `Expira em: ${horas} horas`
+    } else if (minutos > 0) {
+      return `Expira em: ${minutos} minutos`
+    } else {
+      return 'Campanha encerrada'
+    }
+  }
+
+
   return (
+    campanha && campanha[0] && campanha[0].alimentos &&
     <>
       <Navbar user={{ 'cd_foto_usuario': '1', 'nm_usuario': 'Usuário 1' }} />
 
@@ -54,7 +82,7 @@ export const Campanha = () => {
                 <label>Quantidade</label>
               </div>
               <div className="qtdAlimentos">
-                {campanha.alimentos.map((alimento, index) => (
+                {campanha[0].alimentos.map((alimento, index) => (
                   <div key={index} className="row">
                     <div className="alimento-campanha">
                       <input
@@ -87,16 +115,16 @@ export const Campanha = () => {
 
       <main className="pg_campanha">
         <div className="container-campanha column">
-          <div key={campanha.nm_titulo_campanha}>
-            <h1 className="titulo black">{campanha.nm_titulo_campanha}</h1>
+          <div key={campanha[0].nm_titulo_campanha}>
+            <h1 className="titulo black">{campanha[0].nm_titulo_campanha}</h1>
             <div className="subcontainer-campanha row">
               <div className="container-descricao">
                 <div className="container-img">
-                  <img src={`/assets/campanhas/${campanha.cd_imagem_campanha}.png`} alt="" />
+                  <img src={`/assets/campanhas/${campanha[0].cd_imagem_campanha}`} alt="" />
                 </div>
                 <div className="descricao">
                   <h1 className="sub titulo black">Descrição</h1>
-                  <p>{campanha.ds_acao_campanha}</p>
+                  <p>{campanha[0].ds_acao_campanha}</p>
                   <div className="denunciar">
                     <Link className="row" to={`#`}>
                       <img src="/assets/img/icone_denounce_black.svg" alt="Denunciar" />
@@ -109,28 +137,28 @@ export const Campanha = () => {
                 <header className="header-alimentos row">
                   <div className="usuario row">
                     <div className="img-wrapper">
-                      <img src={`/assets/profile/${campanha.cd_foto_usuario}.png`} alt="Foto do usuário" />
+                      <img src={`/assets/profile/${campanha[0].cd_foto_usuario}`} alt="Foto do usuário" />
                     </div>
                     <div>
-                      <h2>{campanha.nm_usuario}</h2>
-                      <p className="titulo-gray cidadeEstado">{`${campanha.nm_cidade_usuario}, ${campanha.sg_estado_usuario}`}</p>
+                      <h2>{campanha[0].nm_usuario}</h2>
+                      <p className="titulo-gray cidadeEstado">{`${campanha[0].nm_cidade_campanha}, ${campanha[0].sg_estado_campanha}`}</p>
                     </div>
                   </div>
                   <div className="header-campanha">
                     <div>
                       <img src="/assets/img/icone_pin.svg" alt="Icone pin" />
-                      <p className="cidadeEstado">{`${campanha.nm_cidade_campanha}, ${campanha.sg_estado_campanha}`}</p>
+                      <p className="cidadeEstado">{`${campanha[0].nm_cidade_campanha}, ${campanha[0].sg_estado_campanha}`}</p>
                     </div>
                     <div>
                       <img src="/assets/img/icone_relogio.svg" alt="Icone relógio" />
-                      <p>Expira em: {campanha.qt_tempo_restante}</p>
+                      <p>{contarTempoRestante(campanha[0].anos_restantes, campanha[0].meses_restantes, campanha[0].dias_restantes, campanha[0].horas_restantes, campanha[0].minutos_restantes)}</p>
                     </div>
                   </div>
                 </header>
                 <div className="main-alimentos column">
                   <h2 className="titulo black">Alimentos:</h2>
                   <div className="alimento-container column">
-                    {campanha.alimentos.map((alimento) => (
+                    {campanha[0].alimentos.map((alimento) => (
                       <div key={alimento.nm_alimento} className="alimento column">
                         <h2 className="sub titulo">{alimento.nm_alimento}</h2>
                         <div className="progresso-container row">
@@ -157,7 +185,7 @@ export const Campanha = () => {
           </div>
         </div>
       </main>
-      
+
       <Footer></Footer>
     </>
 
