@@ -32,11 +32,11 @@
                     height: 3.5rem;
                     cursor: pointer;
 
-                    &[name="estado"] {
+                    &[name="sg_estado_campanha"] {
                         border-radius: 0.8rem 0 0 0.8rem;
                     }
 
-                    &[name="cidade"] {
+                    &[name="nm_cidade_campanha"] {
                         min-width: 20rem;
                         border-radius: 0;
                     }
@@ -169,7 +169,7 @@
                                 &.master {
                                     white-space: normal;
                                     width: max-content;
-                                    overflow: visible;
+                                    overflow: hidden;
                                     display: flex;
                                 }
 

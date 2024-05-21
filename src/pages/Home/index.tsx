@@ -22,7 +22,7 @@ export const Home: React.FC = () => {
     return (
         <>
             <title>Página inicial</title>
-            <Navbar user={{ 'cd_foto_usuario': '1', 'nm_usuario': 'Usuário 1' }} />
+            <Navbar />
             <main className="pg_index">
                 <section className="section arrecade">
                     <div className="wrapper arrecade">
