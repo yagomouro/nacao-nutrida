@@ -1,10 +1,4 @@
-export interface IAlimento {
-    nm_alimento: string;
-    cd_campanha_alimento: number;
-    nm_medida_alimento: string;
-    qt_alimento: number;
-    qt_doada_alimento: number;
-}
+import { IAlimentoDoado } from "./IAlimento";
 
 export interface ICampanha {
     cd_campanha: number;
@@ -20,14 +14,26 @@ export interface ICampanha {
     cd_imagem_campanha: string;
     qt_doacoes_campanha: number;
     minutos_restantes: number,
-	horas_restantes: number,
+    horas_restantes: number,
     dias_restantes: number,
     meses_restantes: number,
     anos_restantes: number,
 }
 
-export interface ICampanhaAlimento extends ICampanha{
+export interface ICampanhaAlimento extends ICampanha {
     nm_usuario: string;
     cd_foto_usuario: string;
-    alimentos: IAlimento[]
+    alimentos: IAlimentoDoado[]
+}
+
+export interface ICampanhaNova {
+    cd_campanha: number;
+    cd_usuario_campanha: number;
+    nm_titulo_campanha: string;
+    dt_encerramento_campanha: string;
+    nm_cidade_campanha: string;
+    sg_estado_campanha: string;
+    ds_acao_campanha: string;
+    qt_total_campanha: number;
+    cd_imagem_campanha: string;
 }

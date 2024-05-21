@@ -71,11 +71,11 @@
         }
 
         .input-form {
-            &[name="estado"] {
+            &[name="sg_estado_campanha"] {
                 min-width: 18rem;
             }
 
-            &[name="cidade"] {
+            &[name="nm_cidade_campanha"] {
                 min-width: 25rem;
             }
         }
@@ -148,7 +148,7 @@
                 height: 20rem;
             }
 
-            .imagePed {
+            .imageCampanha {
                 // background-image: url(/assets/campanhas/default.png);
                 background-repeat: no-repeat;
                 background-size: cover;

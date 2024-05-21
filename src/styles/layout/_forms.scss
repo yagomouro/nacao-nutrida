@@ -3,11 +3,11 @@
     // justify-content: center;
 
     &.pg_cadastro {
-        select[name="estado"] {
+        select[name="sg_estado_campanha"] {
             width: 20rem;
         }
 
-        select[name="cidade"] {
+        select[name="nm_cidade_campanha"] {
             width: 27rem;
         }
     }

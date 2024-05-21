@@ -1,25 +1,33 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
 
 import { useState } from 'react'
+import { IUsuario } from '../../types/IUsuario';
 
-interface User {
-  cd_foto_usuario: string;
-  nm_usuario: string;
-}
+import { UserContext } from '../../contexts/userContext';
+
+import { AuthContext } from '../../contexts/authContext';
 
 interface HeaderProps {
-  user?: User;
   page?: string;
 }
 
-export const Navbar: React.FC<HeaderProps> = ({ user, page }) => {
+export const Navbar: React.FC<HeaderProps> = ({ page }) => {
 
   const [toggledMenu, setToggledMenu] = useState(false);
+
+  const user = useContext(UserContext)
+
+  const authenticated = useContext(AuthContext)
 
   const handleToggleMenu = () => {
     setToggledMenu(!toggledMenu)
   };
+
+  const handleLogout = () => {
+    authenticated.setAuthenticated(false)
+  };
+
 
   return (
     <header>
@@ -29,7 +37,7 @@ export const Navbar: React.FC<HeaderProps> = ({ user, page }) => {
         </Link>
         <div className={`nav-menu ${toggledMenu ? 'toggled' : ''}`}>
 
-          {user ?
+          {authenticated.authenticated ?
             <>
               <ul className="row nav-list">
                 <>
@@ -47,8 +55,8 @@ export const Navbar: React.FC<HeaderProps> = ({ user, page }) => {
               <div className="row nav-profile" onClick={handleToggleMenu}>
                 <div className="img-wrapper">
                   <img
-                    key={user.cd_foto_usuario}
-                    src={`/assets/profile/${user.cd_foto_usuario}.png`}
+                    key={`${user.user.cd_foto_usuario}`}
+                    src={`/assets/profile/${user.user.cd_foto_usuario}`}
                     className="img-profile"
                     alt="Foto de perfil"
                   />
@@ -75,7 +83,7 @@ export const Navbar: React.FC<HeaderProps> = ({ user, page }) => {
                     </li>
                   </>
                   <li className="toggle-link logout">
-                    <Link to="/login" className="sub titulo">
+                    <Link onClick={handleLogout} to="/login" className="sub titulo">
                       Logout
                       <img src="/assets/img/icone_logout.svg" alt="Logout" />
                     </Link>

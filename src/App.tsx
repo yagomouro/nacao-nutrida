@@ -1,5 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 
+import { AuthProvider } from './contexts/authContext';
+import { UserProvider } from './contexts/userContext';
 import { Home } from './pages/Home'
 import { NotFound } from './pages/NotFound';
 import { Descobrir } from './pages/Descobrir';
@@ -12,17 +14,21 @@ import { CriacaoCampanha } from './pages/CadastroCampanha';
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path='/' element={<Home />} />
-        <Route path='/login' element={<Login />} />
-        <Route path='/cadastro' element={<Cadastro />} />
-        <Route path='/descobrir' element={<Descobrir />} />
-        <Route path='/campanhas/:cd_campanha' element={<Campanha />} />
-        <Route path='/campanhas/criar' element={<CriacaoCampanha />} />
-        <Route path='*' element={<NotFound />} />
-      </Routes>
-    </BrowserRouter>
+    <AuthProvider>
+      <UserProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path='/' element={<Home />} />
+            <Route path='/login' element={<Login />} />
+            <Route path='/cadastro' element={<Cadastro />} />
+            <Route path='/descobrir' element={<Descobrir />} />
+            <Route path='/campanhas/:cd_campanha' element={<Campanha />} />
+            <Route path='/campanhas/criar' element={<CriacaoCampanha />} />
+            <Route path='*' element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </UserProvider>
+    </AuthProvider>
   );
 }
 

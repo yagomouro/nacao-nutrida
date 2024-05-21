@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 
 import { Footer } from '../../components/Footer'
@@ -7,11 +7,13 @@ import { Navbar } from '../../components/Navbar'
 import axios from 'axios'
 
 import { ICampanhaAlimento } from '../../types/ICampanha';
+import { UserContext } from '../../contexts/userContext';
 
 
 export const Campanha = () => {
   const navigate = useNavigate()
   const [campanha, setCampanha] = useState<ICampanhaAlimento[]>([])
+  const user = useContext(UserContext)
 
   const { cd_campanha } = useParams();
 
@@ -37,7 +39,7 @@ export const Campanha = () => {
   };
 
   function contarProgresso(qt_doacoes_campanha: number, qt_total_campanha: number) {
-    let percentage = Math.floor((qt_doacoes_campanha * 100) / qt_total_campanha)
+    let percentage = Math.floor((qt_doacoes_campanha * 100) / qt_total_campanha) || 0
 
     if (percentage > 100) {
       return `100%`
@@ -63,11 +65,69 @@ export const Campanha = () => {
     }
   }
 
+  function handleSubmit(event: any) {
+    event.preventDefault();
+
+    let infos_doacao = {
+      cd_usuario_doacao: user.user.cd_usuario,
+      cd_campanha_doacao: cd_campanha,
+    }
+
+    console.log(infos_doacao)
+
+    let lengthAlimentos = campanha[0].alimentos.length
+
+    let alimentos_doacao = Array.from({ length: lengthAlimentos }, (_, index) => {
+      const cd_alimento = parseInt(event.target.cd_alimento[index].value);
+      const qt_alimento_doacao = parseInt(event.target.qt_alimento_doacao[index].value);
+
+      if (qt_alimento_doacao > 0) {
+        return {
+          cd_alimento,
+          qt_alimento_doacao
+        };
+      } else {
+        return null;
+      }
+    }).filter(item => item !== null);
+
+    console.log(alimentos_doacao)
+
+    const dbInsert = async () => {
+      try {
+        const response = await axios.post('/api/doacoes', {
+          infos_doacao: infos_doacao,
+          alimentos_doacao: alimentos_doacao
+        });
+        return [response.status, response.data];
+      } catch (error) {
+        console.error('Erro:', error);
+        throw error;
+      }
+    }
+
+    const handleDBInsert = async () => {
+      try {
+        const [responseStatus, responseData] = await dbInsert();
+        if (responseStatus != 200) {
+          console.log('Erro ao salvar dados no banco')
+        } else {
+          console.log('Sucesso ao salvar dados no banco ', responseData)
+          window.location.reload();
+        }
+      } catch (error) {
+        console.error('Erro ao inserir dados:', error);
+      }
+    }
+
+    handleDBInsert();
+  }
+
 
   return (
     campanha && campanha[0] && campanha[0].alimentos &&
     <>
-      <Navbar user={{ 'cd_foto_usuario': '1', 'nm_usuario': 'Usuário 1' }} />
+      <Navbar />
 
       <div className={`lyt_denuncia pg_contribuir campanha ${modalVisible ? 'visible' : ''}`}>
         <div className="form-container campanha column">
@@ -75,7 +135,7 @@ export const Campanha = () => {
             <img className="closeModal" src="/assets/img/icone_times_black.svg" alt="" onClick={handleCloseModal} />
           </div>
           <p className="sub titulo">Informe a quantidade da doação:</p>
-          <form className="form-login column" method="GET">
+          <form className="form-login column" method="POST" onSubmit={handleSubmit}>
             <div className="alimento column">
               <div className="desc row">
                 <label>Alimento</label>
@@ -88,15 +148,16 @@ export const Campanha = () => {
                       <input
                         className="input-form nmAl"
                         type="text"
-                        name={`nmAlimento${index}`}
+                        name={`nm_alimento`}
                         value={alimento.nm_alimento}
                         readOnly
                       />
                     </div>
                     <div className="alimento-quantidade">
                       <div className="qtdAl">
-                        <input className="input-form" type="number" name={`qtd${index}`} min="0" />
-                        <h1 className="sub titulo">{alimento.nm_medida_alimento}</h1>
+                        <input className="input-form" type="number" name={`qt_alimento_doacao`} min="0" />
+                        <input type="hidden" name={`cd_alimento`} value={alimento.cd_alimento} />
+                        <h1 className="sub titulo">{alimento.sg_medida_alimento}</h1>
                       </div>
                     </div>
                   </div>
@@ -163,17 +224,17 @@ export const Campanha = () => {
                         <h2 className="sub titulo">{alimento.nm_alimento}</h2>
                         <div className="progresso-container row">
                           <div className="arrecadado">
-                            <p><span className={`arrecadado-${replaceSpace(alimento.nm_alimento)}`}>{contarProgresso(alimento.qt_doada_alimento, alimento.qt_alimento)}</span></p>
+                            <p><span className={`arrecadado-${replaceSpace(alimento.nm_alimento)}`}>{contarProgresso(alimento.qt_alimento_doado, alimento.qt_alimento_meta)}</span></p>
                           </div>
                           <div className="porcentagem">
                             <div className="progresso-barra">
-                              <div style={{ width: contarProgresso(alimento.qt_doada_alimento, alimento.qt_alimento) }} className={`progresso-atual progresso-atual-${replaceSpace(alimento.nm_alimento)}`}></div>
+                              <div style={{ width: contarProgresso(alimento.qt_alimento_doado, alimento.qt_alimento_meta) }} className={`progresso-atual progresso-atual-${replaceSpace(alimento.nm_alimento)}`}></div>
                             </div>
                           </div>
                         </div>
                         <div className="meta row">
-                          <p>{`Arrecadado: ${alimento.qt_doada_alimento} ${alimento.nm_medida_alimento}`}</p>
-                          <p>{`Meta: ${alimento.qt_alimento} ${alimento.nm_medida_alimento}`}</p>
+                          <p>{`Arrecadado: ${alimento.qt_alimento_doado} ${alimento.sg_medida_alimento}`}</p>
+                          <p>{`Meta: ${alimento.qt_alimento_meta} ${alimento.sg_medida_alimento}`}</p>
                         </div>
                       </div>
                     ))}
