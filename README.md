@@ -5,7 +5,7 @@ Faculdade: Dr. Thomaz Novelino (Fatec Franca)
 
 Nosso portal tem um propósito especial: arrecadar alimentos para doação. Através de doações virtuais, os usuários podem contribuir com alimentos básicos que serão entregues a quem mais precisa.
 
-## 🚀 Começando
+## 🚀 Iniciando
 
 Bem-vindo ao Nação Nutrida! Este projeto tem como objetivo arrecadar alimentos para doação através de doações virtuais. Estamos ansiosos para que você contribua para este projeto e ajude a fazer uma diferença na vida das pessoas.
 
@@ -19,11 +19,14 @@ npm >= a versão 6.14.13
 ### 🔧 Instalação
 ```
 Para executar o projeto, é necessario instalar suas depencias.
-1- npm i
-2- npm i typescritp
+1. npm install
+2. npm install typescript
+3. npm run start (para o Front-End)
+4. npm run dev (para o Back-End)
+
 
 ```
-## 🛠️ Construído com
+## 🛠️ Tecnologias Utilizadas
 
 * [Typescript](https://www.typescriptlang.org/)
 * [React](https://react.dev/)
@@ -32,7 +35,7 @@ Para executar o projeto, é necessario instalar suas depencias.
 
 ## 📌 Versão
 
-Versão atual 1.0.0
+Versão atual 0.0.3
 
 ## ✒️ Autores
 
@@ -42,7 +45,7 @@ Versão atual 1.0.0
 * **Jorge Patrocinio** - (https://github.com/jorgesantos001)
 
 
-## 🎁 Expressões de gratidão
+## 🎁 Agradecimentos
 
 Caros colegas e participantes do projeto,
 
@@ -52,4 +55,3 @@ Aproveito para encorajar todos a contarem sobre este projeto incrível para outr
 
 ---
 ❤️😊
-
