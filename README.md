@@ -27,7 +27,7 @@ MySQL 8.0
 
 2. Instale o MySQL 8.0:
   * [Tutorial de instalação](https://www.youtube.com/watch?v=fmerTu7dWk8)
-4. Execute o script SQL para configurar o banco de dados:
+3. Execute o script SQL para configurar o banco de dados:
   * Localize o arquivo 'popularBanco.sql' no diretório '/database'
   * Rode o script no MySQL para criar as tabelas e inserir os dados necessários
 
