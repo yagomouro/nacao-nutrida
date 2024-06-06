@@ -143,10 +143,6 @@ VALUES
 (5, 'Unidos Pela Nutrição', '2024-07-20 00:00:00', '2024-03-15 19:59:04', 'Belo Horizonte', 'MG', 'A pandemia afetou muitas pessoas, e agora mais do que nunca, é importante estender a mão para ajudar. Participe desta campanha e faça parte da mudança positiva.', '3.png', 0),
 (1, 'Doação de Alimentos Essenciais', '2024-06-25 00:00:00', '2024-03-15 19:59:04', 'Franca', 'SP', 'Juntos podemos fazer a diferença! Com sua contribuição, podemos distribuir cestas básicas para comunidades carentes, proporcionando alívio imediato e esperança para o futuro.', '4.png', 0),
 (2, 'Compaixão em Ação', '2024-06-30 00:00:00', '2024-03-15 19:59:04', 'Franca', 'SP', 'A fome não espera. É por isso que estamos mobilizando recursos e voluntários para garantir que todos tenham acesso a alimentos nutritivos. Faça parte desta iniciativa transformadora.', '5.png', 0),
-(5, 'Alimentando o Futuro', '2025-04-05 00:00:00', '2024-03-15 19:59:04', 'Franca', 'SP', 'Cada doação conta! Ao participar desta campanha, você está ajudando a garantir que as crianças tenham comida na mesa e a construir um futuro mais brilhante para elas.', '6.png', 0),
-(1, 'Juntos Contra a Fome', '2025-04-10 00:00:00', '2024-03-15 19:59:04', 'Franca', 'SP', 'Nossa comunidade está unida na luta contra a fome. Junte-se a nós e faça sua parte para garantir que todos tenham acesso a alimentos adequados e saudáveis.', '7.png', 0),
-(2, 'Cesta Básica de Esperança', '2025-04-15 00:00:00', '2024-03-15 19:59:04', 'Franca', 'SP', 'Esta campanha busca fornecer cestas básicas para famílias em situação de extrema pobreza. Sua generosidade pode fazer toda a diferença na vida de alguém.', '1.png', 0),
-(5, 'Cuidando dos Nossos Vizinhos', '2025-04-20 00:00:00', '2024-03-15 19:59:04', 'São Paulo', 'SP', 'Cada gesto de solidariedade conta. Ao participar desta campanha, você está ajudando a construir uma comunidade mais forte e resiliente.', '2.png', 0);
 
 
 
