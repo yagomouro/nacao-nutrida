@@ -59,7 +59,7 @@ Versão atual 0.0.3
 
 ## ✒️ Autores
 
-* **Yago Mouro** - (https://github.com/yagomouro?tab=repositories)
+* **Yago Mouro** - (https://github.com/yagomouro)
 * **Leonardo Victor** - (https://github.com/Leovpf)
 * **Rafael Victor** - (https://github.com/rafaelVictor05)
 * **Jorge Patrocinio** - (https://github.com/jorgesantos001)
