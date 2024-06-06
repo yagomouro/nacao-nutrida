@@ -3,7 +3,7 @@
 Projeto interdisciplinar DSM 2° SEMESTRE 2024 
 Faculdade: Dr. Thomaz Novelino (Fatec Franca) 
 
-Nosso portal tem um propósito especial: arrecadar alimentos para doação. Através de doações virtuais, os usuários podem contribuir com alimentos básicos que serão entregues a quem mais precisa.
+Nosso projeto tem um propósito especial: arrecadar alimentos para doação. Através de doações virtuais, os usuários podem contribuir com alimentos básicos que serão entregues a quem mais precisa.
 
 ## 🚀 Iniciando
 
@@ -14,23 +14,43 @@ Bem-vindo ao Nação Nutrida! Este projeto tem como objetivo arrecadar alimentos
 ```
 Node.js >=  a versão 14.17.0
 npm >= a versão 6.14.13
+MySQL 8.0
 ```
 
 ### 🔧 Instalação
+
+1. Instale as dependências do projeto:
 ```
-Para executar o projeto, é necessario instalar suas depencias.
 1. npm install
 2. npm install typescript
-3. npm run start (para o Front-End)
-4. npm run dev (para o Back-End)
-
-
 ```
+
+2. Instale o MySQL 8.0:
+  * [Tutorial de instalação](https://www.youtube.com/watch?v=fmerTu7dWk8)
+4. Execute o script SQL para configurar o banco de dados:
+  * Localize o arquivo 'popularBanco.sql' no diretório '/database'
+  * Rode o script no MySQL para criar as tabelas e inserir os dados necessários
+
+## Executando o projeto
+
+Front-End:
+1. Na pasta raiz do projeto, execute:
+```
+npm run start
+```
+
+Back-End: 
+1. É necessário entrar na pasta '/server' e rodar o script
+2. Execute o servidor:
+```
+npm run dev
+```
+
 ## 🛠️ Tecnologias Utilizadas
 
 * [Typescript](https://www.typescriptlang.org/)
 * [React](https://react.dev/)
-* [SqlServer] (https://www.microsoft.com/pt-br/sql-server/sql-server-downloads)
+* [MySQL 8.0](https://www.youtube.com/watch?v=fmerTu7dWk8)
 
 
 ## 📌 Versão
@@ -47,11 +67,9 @@ Versão atual 0.0.3
 
 ## 🎁 Agradecimentos
 
-Caros colegas e participantes do projeto,
+Gostaríamos de expressar nossa gratidão a todos os colegas e participantes do projeto pelo empenho, dedicação e colaboração ao longo do desenvolvimento do "Nação Nutrida". Cada um contribuiu de maneira única e indispensável para o sucesso do projeto.
 
-Gostaria de expressar minha mais profunda gratidão a todos vocês pelo empenho, dedicação e colaboração ao longo do nosso projeto. Cada um de vocês contribuiu de maneira única e indispensável para o sucesso do "Nação Nutrida", e por isso, sou imensamente grato.
-
-Aproveito para encorajar todos a contarem sobre este projeto incrível para outras pessoas. Nossa jornada não apenas fortaleceu nossas habilidades profissionais, mas também nos aproximou como equipe e amigos. Vamos compartilhar essa experiência e inspirar outros com o que alcançamos juntos!
+Encorajamos todos a compartilhar este projeto com outras pessoas. Nossa jornada não apenas fortaleceu nossas habilidades profissionais, mas também nos aproximou como equipe. Vamos inspirar outros com o que alcançamos juntos!
 
 ---
 ❤️😊
