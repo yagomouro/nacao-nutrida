@@ -47,9 +47,13 @@ export const Login = () => {
     const handleSubmit = (event: any) => {
         event.preventDefault();
 
-        const user_email = event.target.email.value
-        const user_password = event.target.password.value
+        const user_email = event.target.email.value;
+        const user_password = event.target.password.value;
 
+        if (!user_email || !user_password) {
+            alert('Por favor, preencha todos os campos.');
+            return;
+    }
         const userLogin = async () => {
             try {
                 const response = await axios.post<responseUserData>('/api/usuarioLogin', {
@@ -84,14 +88,18 @@ export const Login = () => {
                         navigate('/descobrir')
                     } else {
                         console.log('Usuario ou senha inválidos', data)
+                        alert('Usuario ou senha inválidos. Por favor, tente novamente.');
                     }
                 }
             } catch (error) {
                 console.error('Erro ao fazer login', error);
+                alert('Usuario ou senha inválidos. Por favor, tente novamente.');
             }
         }
 
         handleUserLogin();
+
+        event.target.reset();
     }
 
     function showPassword() {
