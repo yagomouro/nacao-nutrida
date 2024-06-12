@@ -57,6 +57,14 @@ npm run dev
 
 Versão atual 0.0.3
 
+## Modelagem Conceitual
+
+<img src="public/assets/modelagem banco/modelagemConceitual.png">
+
+## Modelagem Lógica
+
+<img src="public/assets/modelagem banco/modelagemLogica.png">
+
 ## ✒️ Autores
 
 * **Yago Mouro** - (https://github.com/yagomouro)

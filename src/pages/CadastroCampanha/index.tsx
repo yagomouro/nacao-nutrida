@@ -15,21 +15,19 @@ interface FoodProps {
 }
 
 const Food: React.FC<FoodProps> = ({ id, delFood }) => {
-    const [listaCategoriaAlimentos, setListaCategoriaAlimentos] = useState<IAlimentoLista[]>([])
-    const [listaAlimentos, setListaAlimentos] = useState<IAlimento[]>([])
-    const [alimentoSelecionado, setAlimentoSelecionado] = useState<IAlimento>()
+    const [listaCategoriaAlimentos, setListaCategoriaAlimentos] = useState<IAlimentoLista[]>([]);
+    const [listaAlimentos, setListaAlimentos] = useState<IAlimento[]>([]);
+    const [alimentoSelecionado, setAlimentoSelecionado] = useState<IAlimento>();
 
     useEffect(() => {
-        axios.get<IAlimentoLista[]>('/api/alimentos').then((response) => {
-            setListaCategoriaAlimentos(response.data)
-        }).catch((err) => {
-            console.log('Error: ' + err)
-        })
-    }, [])
+        axios.get<IAlimentoLista[]>('/api/alimentos')
+            .then(response => setListaCategoriaAlimentos(response.data))
+            .catch(err => console.log('Error: ' + err));
+    }, []);
 
     useEffect(() => {
         if (listaCategoriaAlimentos.length > 0) {
-            const alimentos = listaCategoriaAlimentos.find(alimentos => alimentos.cd_tipo_alimento === 1)!.alimentos;
+            const alimentos = listaCategoriaAlimentos.find(alimentos => alimentos.cd_tipo_alimento === 1)?.alimentos || [];
             alimentos.sort((a, b) => a.cd_alimento - b.cd_alimento);
             setListaAlimentos(alimentos);
         }
@@ -40,68 +38,59 @@ const Food: React.FC<FoodProps> = ({ id, delFood }) => {
             const alimento = listaAlimentos.find(alimentos => alimentos.cd_alimento === 1);
             setAlimentoSelecionado(alimento);
         }
-    }, [listaCategoriaAlimentos]);
+    }, [listaAlimentos]);
 
     const handleChangeTipoAlimentoSelecionado = (event: React.ChangeEvent<HTMLSelectElement>) => {
         const selectedTipo = parseInt(event.target.value);
-
-        const alimentos = listaCategoriaAlimentos.find(alimentos => alimentos.cd_tipo_alimento === selectedTipo)!.alimentos;
+        const alimentos = listaCategoriaAlimentos.find(alimentos => alimentos.cd_tipo_alimento === selectedTipo)?.alimentos || [];
         alimentos.sort((a, b) => a.cd_alimento - b.cd_alimento);
         setListaAlimentos(alimentos);
     };
 
     const handleChangeAlimentoSelecionado = (event: React.ChangeEvent<HTMLSelectElement>) => {
         const selecteIdAlimento = parseInt(event.target.value);
-
         const alimento = listaAlimentos.find(alimento => alimento.cd_alimento === selecteIdAlimento);
         setAlimentoSelecionado(alimento);
     };
 
-
     return (
-        <>
-            <div className="alimento row" id={id.toString()}>
-                <div className="tipo-input">
-                    <label>Tipo</label>
-                    <select className="input-form tpf" name="cd_tipo_alimento" onChange={handleChangeTipoAlimentoSelecionado}>
-                        <option value="0" disabled={true}>
-                            Selecione um tipo
+        <div className="alimento row" id={id.toString()}>
+            <div className="tipo-input">
+                <label>Tipo</label>
+                <select className="input-form tpf" name="cd_tipo_alimento" onChange={handleChangeTipoAlimentoSelecionado}>
+                    <option value="0" disabled>Selecione um tipo</option>
+                    {listaCategoriaAlimentos.map(alimentos => (
+                        <option key={alimentos.cd_tipo_alimento} value={alimentos.cd_tipo_alimento}>
+                            {alimentos.nm_tipo_alimento}
                         </option>
-                        {listaCategoriaAlimentos.map((alimentos) => (
-                            <option value={alimentos.cd_tipo_alimento}>
-                                {alimentos.nm_tipo_alimento}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-
-                <div className="alimento-input">
-                    <label>Alimento</label>
-                    <select className="input-form alimentoInput" name="cd_alimento" onChange={handleChangeAlimentoSelecionado}>
-                        <option value="0" disabled={true}>
-                            Selecione um alimento
-                        </option>
-                        {listaAlimentos.map((alimento) => (
-                            <option value={alimento.cd_alimento}>
-                                {alimento.nm_alimento}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-
-                <div className="quantidade-input">
-                    <label>Quantidade</label>
-                    <div className="qtdAl row">
-                        <input className="input-form quantidade" type="number" min="1" name="qt_alimento_meta" />
-                        <h1 className="sub titulo medidaAlimento">{alimentoSelecionado?.sg_medida_alimento}</h1>
-                    </div>
-                </div>
-
-                <button className="btn red excluir" type="button" onClick={delFood}>
-                    <img src="/assets/img/trash.svg" alt="excluir" />
-                </button>
+                    ))}
+                </select>
             </div>
-        </>
+
+            <div className="alimento-input">
+                <label>Alimento</label>
+                <select className="input-form alimentoInput" name="cd_alimento" onChange={handleChangeAlimentoSelecionado}>
+                    <option value="0" disabled>Selecione um alimento</option>
+                    {listaAlimentos.map(alimento => (
+                        <option key={alimento.cd_alimento} value={alimento.cd_alimento}>
+                            {alimento.nm_alimento}
+                        </option>
+                    ))}
+                </select>
+            </div>
+
+            <div className="quantidade-input">
+                <label>Quantidade</label>
+                <div className="qtdAl row">
+                    <input className="input-form quantidade" type="number" min="1" name="qt_alimento_meta" />
+                    <h1 className="sub titulo medidaAlimento">{alimentoSelecionado?.sg_medida_alimento}</h1>
+                </div>
+            </div>
+
+            <button className="btn red excluir" type="button" onClick={delFood}>
+                <img src="/assets/img/trash.svg" alt="excluir" />
+            </button>
+        </div>
     );
 };
 
@@ -134,20 +123,24 @@ const Food: React.FC<FoodProps> = ({ id, delFood }) => {
 // }
 
 export const CriacaoCampanha = () => {
-    const [qtAlimentos, setQtAlimentos] = useState<number>(1)
-    const [listaEstadosCidades, setListaEstadosCidades] = useState<IEstadoCidades[]>([])
-    const [listaCidades, setListaCidades] = useState<string[]>([])
-    const [cidadeSelecionada, setCidadeSelecionada] = useState<string>('')
-    const user = useContext(UserContext)
-    const navigate = useNavigate()
+    const [qtAlimentos, setQtAlimentos] = useState<number>(1);
+    const [listaEstadosCidades, setListaEstadosCidades] = useState<IEstadoCidades[]>([]);
+    const [listaCidades, setListaCidades] = useState<string[]>([]);
+    const [cidadeSelecionada, setCidadeSelecionada] = useState<string>('');
+    const user = useContext(UserContext);
+    const navigate = useNavigate();
 
     useEffect(() => {
-        axios.get('/api/estadosCidades').then((response) => {
-            setListaEstadosCidades(response.data)
-        }).catch((err) => {
-            console.log('Error: ' + err)
-        })
-    }, [])
+        axios.get('/api/estadosCidades')
+            .then(response => setListaEstadosCidades(response.data))
+            .catch(err => console.log('Error: ' + err));
+    }, []);
+
+    useEffect(() => {
+        if (!user.user) {
+            navigate('/login');
+        }
+    }, [user, navigate]);
 
     // async function fetchStatesAndCities() {
     //     try {
@@ -189,22 +182,61 @@ export const CriacaoCampanha = () => {
 
     const handleChangeEstadoSelecionado = (event: React.ChangeEvent<HTMLSelectElement>) => {
         const selectedEstado = event.target.value;
-
-        const estado = listaEstadosCidades.find(estado => estado.sg_estado === selectedEstado)!.cidades;
+        const estado = listaEstadosCidades.find(estado => estado.sg_estado === selectedEstado)?.cidades || [];
         setListaCidades(estado);
     };
 
     const handleChangeCidadeSelecionada = (event: React.ChangeEvent<HTMLSelectElement>) => {
         const selectCidade = event.target.value;
+        setCidadeSelecionada(selectCidade);
+    };
 
-        const cidade = listaCidades.find(cidade => cidade === selectCidade)!;
-        setCidadeSelecionada(cidade);
+    const validateCampanha = (event: any, qtAlimentos: number) => {
+        if (!event.target.nm_titulo_campanha.value) {
+            alert("Título da campanha é obrigatório");
+            return false;
+        }
+
+        if (!event.target.dt_encerramento_campanha.value) {
+            alert("Data de encerramento da campanha é obrigatória");
+            return false;
+        }
+
+        if (!event.target.sg_estado_campanha.value) {
+            alert("Estado de entrega é obrigatório");
+            return false;
+        }
+
+        if (!event.target.nm_cidade_campanha.value) {
+            alert("Cidade de entrega é obrigatória");
+            return false;
+        }
+
+        if (qtAlimentos < 1) {
+            alert("Deve haver pelo menos um alimento cadastrado");
+            return false;
+        }
+
+        for (let i = 0; i < qtAlimentos; i++) {
+            if (!event.target.cd_alimento[i].value || !event.target.qt_alimento_meta[i].value) {
+                alert("Todos os campos de alimento devem ser preenchidos");
+                return false;
+            }
+        }
+
+        return true;
     };
 
     const handleSubmit = (event: any) => {
         event.preventDefault();
 
-        let infos_campanha = {
+        const qtAlimentos = parseInt(event.target.qt_alimentos.value);
+
+        if (!validateCampanha(event, qtAlimentos)) {
+            return;
+        }
+
+        const infos_campanha = {
             cd_usuario_campanha: user.user.cd_usuario,
             nm_titulo_campanha: event.target.nm_titulo_campanha.value,
             dt_encerramento_campanha: event.target.dt_encerramento_campanha.value,
@@ -212,59 +244,52 @@ export const CriacaoCampanha = () => {
             sg_estado_campanha: event.target.sg_estado_campanha.value,
             ds_acao_campanha: event.target.ds_acao_campanha.value,
             cd_imagem_campanha: event.target.ds_acao_campanha.value,
-        }
+        };
 
-        console.log(infos_campanha)
-
-        let alimentos_campanha = Array.from({ length: qtAlimentos }, (_, index) => (
-            {
-                cd_alimento: parseInt(event.target.cd_alimento[index].value),
-                qt_alimento_meta: parseInt(event.target.qt_alimento_meta[index].value)
-            }
-        ))
-
-        console.log(alimentos_campanha)
+        const alimentos_campanha = Array.from({ length: qtAlimentos }, (_, index) => ({
+            cd_alimento: parseInt(event.target.cd_alimento[index].value),
+            qt_alimento_meta: parseInt(event.target.qt_alimento_meta[index].value),
+        }));
 
         const dbInsert = async () => {
             try {
                 const response = await axios.post('/api/campanhas', {
-                    infos_campanha: infos_campanha,
-                    alimentos_campanha: alimentos_campanha
+                    infos_campanha,
+                    alimentos_campanha
                 });
                 return [response.status, response.data];
             } catch (error) {
                 console.error('Erro:', error);
                 throw error;
             }
-        }
+        };
 
         const handleDBInsert = async () => {
             try {
                 const [responseStatus, responseData] = await dbInsert();
-                if (responseStatus != 200) {
-                    console.log('Erro ao salvar dados no banco')
+                if (responseStatus !== 200) {
+                    console.log('Erro ao salvar dados no banco');
                 } else {
-                    console.log('Sucesso ao salvar dados no banco ', responseData)
-                    navigate('/descobrir')
+                    console.log ('Sucesso ao salvar dados no banco ', responseData);
+                    navigate('/descobrir');
                 }
             } catch (error) {
                 console.error('Erro ao inserir dados:', error);
             }
-        }
+        };
 
         handleDBInsert();
     };
 
-
     const addFood = () => {
         if (qtAlimentos <= 10) {
-            setQtAlimentos(qtAlimentos + 1)
+            setQtAlimentos(qtAlimentos + 1);
         }
     };
 
     const delFood = () => {
         if (qtAlimentos > 1) {
-            setQtAlimentos(qtAlimentos - 1)
+            setQtAlimentos(qtAlimentos - 1);
         }
     };
 
@@ -275,38 +300,37 @@ export const CriacaoCampanha = () => {
                 <div className="form-container column">
                     <h1 className="titulo">Cadastrar campanha</h1>
                     <form className="form-login column" id="formCampanha" method="POST" onSubmit={handleSubmit}>
-
                         <h2 className="sub titulo">Dados iniciais</h2>
                         <div className="dados-iniciais row">
                             <div>
-                                <label htmlFor="">Título</label>
+                                <label htmlFor="titId">Título</label>
                                 <input className="input-form" type="text" name="nm_titulo_campanha" id="titId" maxLength={30} />
                             </div>
                             <div>
-                                <label>Data de encerramento</label>
+                                <label htmlFor="dtCampanha">Data de encerramento</label>
                                 <input className="input-form" type="date" name="dt_encerramento_campanha" id="dtCampanha" />
                             </div>
                         </div>
 
                         <h2 className="sub titulo">Local de entrega do alimento</h2>
-                        <div className=" local-entrega row">
+                        <div className="local-entrega row">
                             <div className="column">
-                                <label htmlFor="">Estado</label>
+                                <label htmlFor="estadoCampanha">Estado</label>
                                 <select name="sg_estado_campanha" className="input-form" id="estadoCampanha" onChange={handleChangeEstadoSelecionado}>
-                                    <option value="0" disabled={true}>Selecione o Estado</option>
-                                    {listaEstadosCidades.map((estado) => (
-                                        <option value={estado.sg_estado}>
+                                    <option value="0" disabled>Selecione o Estado</option>
+                                    {listaEstadosCidades.map(estado => (
+                                        <option key={estado.sg_estado} value={estado.sg_estado}>
                                             {estado.sg_estado}
                                         </option>
                                     ))}
                                 </select>
                             </div>
                             <div className="column">
-                                <label htmlFor="">Cidade</label>
+                                <label htmlFor="cidadeCampanha">Cidade</label>
                                 <select name="nm_cidade_campanha" className="input-form" id="cidadeCampanha" onChange={handleChangeCidadeSelecionada}>
-                                    <option value="0" disabled={true}>Selecione a Cidade</option>
-                                    {listaCidades.map((cidade) => (
-                                        <option value={cidade}>
+                                    <option value="0" disabled>Selecione a Cidade</option>
+                                    {listaCidades.map(cidade => (
+                                        <option key={cidade} value={cidade}>
                                             {cidade}
                                         </option>
                                     ))}
@@ -317,13 +341,11 @@ export const CriacaoCampanha = () => {
                         <h2 className="sub titulo">Alimentos</h2>
                         <div className="alimentos-container">
                             <div className="alimentos-wrapper column">
-                                {
-                                    Array.from({ length: qtAlimentos }, (_, index) => (
-                                        <Food key={index + 1} id={index + 1} delFood={delFood} />
-                                    ))
-                                }
+                                {Array.from({ length: qtAlimentos }, (_, index) => (
+                                    <Food key={index + 1} id={index + 1} delFood={delFood} />
+                                ))}
                             </div>
-                            <input type="text" hidden={true} name="qt_alimentos" id="qtAlim" value={qtAlimentos} />
+                            <input type="text" hidden name="qt_alimentos" value={qtAlimentos} />
 
                             <button className="btn blue-light2 adicionar" type="button" onClick={addFood}>
                                 Adicionar mais um alimento
@@ -331,15 +353,14 @@ export const CriacaoCampanha = () => {
                         </div>
 
                         <h2 className="sub titulo">Dados finais</h2>
-
                         <div className="texts column">
                             <div className="column">
-                                <label htmlFor="">Adicionar descrição da sua ação social</label>
+                                <label htmlFor="descCampanha">Adicionar descrição da sua ação social</label>
                                 <textarea id="descCampanha" className="input-form" name="ds_acao_campanha" cols={30} rows={10}
                                     placeholder="Insira a relevância por trás da sua campanha, descrevendo-a com detalhes. Exemplo: Irei montar cestas básicas para distribuir para a comunidade do morro nova cintra no dia 7 de julho, preciso muito da sua ajuda com os alimentos! Me ajude com o que você puder."></textarea>
                             </div>
 
-                            <label htmlFor="">Adicionar imagem de capa</label>
+                            <label htmlFor="imageCampanha">Adicionar imagem de capa</label>
                             <input className="input-form imageCampanha" type="file" accept="image/*" name="cd_imagem_campanha" />
 
                             <input className="btn blue-light2" type="submit" value="Cadastrar campanha" />
@@ -347,7 +368,6 @@ export const CriacaoCampanha = () => {
                     </form>
                 </div>
             </main>
-
         </>
     );
 };
