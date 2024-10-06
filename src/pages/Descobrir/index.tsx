@@ -10,13 +10,19 @@ import { IEstadoCidades } from '../../types/IEstadoCidade';
 
 export const Descobrir = () => {
   const [campanhas, setCampanhas] = useState<ICampanhaAlimento[]>([])
+  console.log("campanhas 1: ", campanhas);
   const [qtAlimentos, setQtAlimentos] = useState<number>(1)
+  console.log("qtAlimentos 2: ", qtAlimentos);
   const [listaEstadosCidades, setListaEstadosCidades] = useState<IEstadoCidades[]>([])
+  console.log("listaEstadosCidades 3: ", listaEstadosCidades);
   const [listaCidades, setListaCidades] = useState<string[]>([])
+  console.log("listaCidades 4: ", listaCidades);
   const [cidadeSelecionada, setCidadeSelecionada] = useState<string>('')
+  console.log("cidadeSelecionada 5: ", cidadeSelecionada);
 
   useEffect(() => {
     axios.get<IEstadoCidades[]>('/api/estadosCidades').then((response) => {
+      console.log("EstadoCidades 6: ", response.data);
       setListaEstadosCidades(response.data)
     }).catch((err) => {
       console.log('Error: ' + err)
@@ -26,6 +32,7 @@ export const Descobrir = () => {
   useEffect(() => {
     if (listaEstadosCidades.length > 0) {
       const cidades = listaEstadosCidades[0]!.cidades;
+      console.log("cidades 7: ", cidades);
       setListaCidades(cidades);
     }
   }, [listaEstadosCidades]);
@@ -33,21 +40,24 @@ export const Descobrir = () => {
   useEffect(() => {
     if (listaCidades.length > 0) {
       const cidade = listaCidades[0]!;
+      console.log("cidade 8: ", cidade);
       setCidadeSelecionada(cidade);
     }
   }, [listaEstadosCidades]);
 
   const handleChangeEstadoSelecionado = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedEstado = event.target.value;
-
+    console.log("selectedEstado 9: ", selectedEstado);
     const estado = listaEstadosCidades.find(estado => estado.sg_estado === selectedEstado)!.cidades;
+    console.log("estado 10:", estado);
     setListaCidades(estado);
   };
 
   const handleChangeCidadeSelecionada = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectCidade = event.target.value;
-
+    console.log("selectCidade 11:", selectCidade);
     const cidade = listaCidades.find(cidade => cidade === selectCidade)!;
+    console.log("cidade 11:", cidade);
     setCidadeSelecionada(cidade);
   };
 
@@ -113,10 +123,9 @@ export const Descobrir = () => {
 
         <div className="campanhas-container column">
           <h1 className="titulo black">Campanhas mais recentes</h1>
-
           <div className="campanhas row">
             {campanhas.map((campanha) => (
-              <Link key={campanha.cd_campanha} className="campanha-link" to={`/campanhas/${campanha.cd_campanha}`}>
+              <Link key={campanha._id} className="campanha-link" to={`campanhas/${campanha._id}`}>
                 <div className="campanha">
                   <div className="imagem-campanha">
                     <img src={`/assets/campanhas/${campanha.cd_imagem_campanha}`} alt="" />
@@ -141,12 +150,12 @@ export const Descobrir = () => {
                     <div className="progresso-container column">
                       <div className="porcentagem">
                         <div className="progresso-barra">
-                          <div style={{ width: contarProgresso(campanha.qt_doacoes_campanha, campanha.qt_total_campanha) }} className={`progresso-atual progresso-atual-${campanha.cd_campanha}`}></div>
+                          <div style={{ width: contarProgresso(campanha.qt_doacoes_campanha, campanha.qt_total_campanha) }} className={`progresso-atual progresso-atual-${campanha._id}`}></div>
                         </div>
                       </div>
                       <div className="arrecadado">
                         <p>
-                          <span className={`arrecadado-${campanha.cd_campanha}`}>{contarProgresso(campanha.qt_doacoes_campanha, campanha.qt_total_campanha)}</span> arrecadado
+                          <span className={`arrecadado-${campanha._id}`}>{contarProgresso(campanha.qt_doacoes_campanha, campanha.qt_total_campanha)}</span> arrecadado
                         </p>
                       </div>
                     </div>

@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,55 +8,55 @@ datasource db {
 }
 
 model alimento {
-  id              String       @id @default(auto()) @map("_id") @db.ObjectId
-  nm_alimento     String
+  id                  String       @id @default(auto()) @map("_id") @db.ObjectId
+  nm_alimento         String
   sg_medida_alimento  String
   nm_tipo_alimento    String
   cd_tipo_alimento    Int
 }
 
 model campanha {
-  id              String       @id @default(auto()) @map("_id") @db.ObjectId
-  usuario_id      String    @db.ObjectId
-  nm_titulo_campanha     String
+  id                        String       @id @default(auto()) @map("_id") @db.ObjectId
+  usuario_id                String       @db.ObjectId
+  nm_titulo_campanha        String
   dt_encerramento_campanha  DateTime
-  ts_criacao_campanha     DateTime  @default(now())
-  nm_cidade_campanha    String
-  sg_estado_campanha    String
-  ds_acao_campanha      String
-  cd_imagem_campanha    String      @default("default.png")
-  fg_campanha_ativa   Boolean
+  ts_criacao_campanha       DateTime     @default(now())
+  nm_cidade_campanha        String
+  sg_estado_campanha        String
+  ds_acao_campanha          String
+  cd_imagem_campanha        String       @default("default.png")
+  fg_campanha_ativa         Boolean
 }
 
 model alimento_campanha {
-  id              String      @id @default(auto()) @map("_id") @db.ObjectId
-  alimento_id     String    @db.ObjectId
-  campanha_id     String    @db.ObjectId
+  id                String      @id @default(auto()) @map("_id") @db.ObjectId
+  alimento_id       String      @db.ObjectId
+  campanha_id       String      @db.ObjectId
   qt_alimento_meta  Int
 }
 
 model usuario {
 
-  id              String    @id @default(auto()) @map("_id") @db.ObjectId
-  nm_usuario      String
-  ch_cpf_usuario  String?    @unique
-  ch_cnpj_usuario String?    @unique
-  dt_nascimento_usuario  DateTime?
-  nr_celular_usuario    String
-  sg_estado_usuario     String
-  nm_cidade_usuario     String
-  cd_foto_usuario       String  @default("default.png")
-  cd_senha_usuario      String
-  cd_email_usuario      String
-  fg_admin              Int     @default(0)
-  qt_advertencias_usuario   Int @default(0)
-  fg_usuario_deletado    Int    @default(0)
+  id                        String     @id @default(auto()) @map("_id") @db.ObjectId
+  nm_usuario                String
+  ch_cpf_usuario            String?    @unique
+  ch_cnpj_usuario           String?    @unique
+  dt_nascimento_usuario     DateTime
+  nr_celular_usuario        String
+  sg_estado_usuario         String
+  nm_cidade_usuario         String
+  cd_foto_usuario           String     @default("default.png")
+  cd_senha_usuario          String
+  cd_email_usuario          String
+  fg_admin                  Int        @default(0)
+  qt_advertencias_usuario   Int        @default(0)
+  fg_usuario_deletado       Int        @default(0)
 }
 
 model alimento_doacao {
-  id              String    @id @default(auto()) @map("_id") @db.ObjectId 
-  usuario_id     String    @db.ObjectId
-  alimento_id     String    @db.ObjectId
-  campanha_id     String    @db.ObjectId
+  id                String    @id @default(auto()) @map("_id") @db.ObjectId 
+  usuario_id        String    @db.ObjectId
+  alimento_id       String    @db.ObjectId
+  campanha_id       String    @db.ObjectId
   qt_alimento_doado Int
 }

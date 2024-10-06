@@ -1,5 +1,5 @@
 export interface IUsuario {
-    cd_usuario: Number,
+    _id: any,
     nm_usuario: String,
     ch_cpf_usuario: String,
     ch_cnpj_usuario: String,
@@ -16,7 +16,7 @@ export interface IUsuario {
 }
 
 export interface IUsuarioInsert {
-    cd_usuario: Number,
+    _id: any,
     nm_usuario: String,
     ch_documento_usuario: String,
     dt_nascimento_usuario: String,

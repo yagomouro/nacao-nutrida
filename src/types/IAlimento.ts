@@ -1,6 +1,6 @@
 export interface IAlimento {
     nm_alimento: string;
-    cd_alimento: number;
+    _id: string;
     sg_medida_alimento: string;
 }
 

@@ -1,6 +1,9 @@
 const { MongoClient } = require('mongodb');
 
-const url = env("DATABASE_URL");
+const dotenv = require('dotenv');
+dotenv.config({ path: '../.env' });
+
+const url = process.env.DATABASE_URL;
 const dbName = 'nacao-nutrida';
 
 const client = new MongoClient(url);

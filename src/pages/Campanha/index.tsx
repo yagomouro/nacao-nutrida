@@ -15,17 +15,18 @@ export const Campanha = () => {
   const [campanha, setCampanha] = useState<ICampanhaAlimento[]>([])
   const user = useContext(UserContext)
 
-  const { cd_campanha } = useParams();
+  const { _id } = useParams();
 
-  const url = `/api/campanhas?id=${cd_campanha}`
+  const url = `/api/campanhas/${_id}`;
 
   useEffect(() => {
+    if(_id){
     axios.get<ICampanhaAlimento[]>(url).then((response) => {
       setCampanha(response.data)
     }).catch((err) => {
       console.log('Error: ' + err)
     })
-  }, [])
+  }}, [_id])
 
   const [modalVisible, setModalVisible] = useState(false);
 
@@ -69,8 +70,8 @@ export const Campanha = () => {
     event.preventDefault();
 
     let infos_doacao = {
-      cd_usuario_doacao: user.user.cd_usuario,
-      cd_campanha_doacao: cd_campanha,
+      _id_doacao: user.user._id,
+      cd_campanha_doacao: _id,
     }
 
     console.log(infos_doacao)
@@ -78,12 +79,12 @@ export const Campanha = () => {
     let lengthAlimentos = campanha[0].alimentos.length
 
     let alimentos_doacao = Array.from({ length: lengthAlimentos }, (_, index) => {
-      const cd_alimento = parseInt(event.target.cd_alimento[index].value);
+      const _id = event.target._id[index].value;
       const qt_alimento_doacao = parseInt(event.target.qt_alimento_doacao[index].value);
 
       if (qt_alimento_doacao > 0) {
         return {
-          cd_alimento,
+          _id,
           qt_alimento_doacao
         };
       } else {
@@ -156,7 +157,7 @@ export const Campanha = () => {
                     <div className="alimento-quantidade">
                       <div className="qtdAl">
                         <input className="input-form" type="number" name={`qt_alimento_doacao`} min="0" />
-                        <input type="hidden" name={`cd_alimento`} value={alimento.cd_alimento} />
+                        <input type="hidden" name={`_id`} value={alimento._id} />
                         <h1 className="sub titulo">{alimento.sg_medida_alimento}</h1>
                       </div>
                     </div>
