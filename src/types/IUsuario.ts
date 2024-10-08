@@ -25,6 +25,9 @@ export interface IUsuarioInsert {
     nm_cidade_usuario: String,
     cd_senha_usuario: String,
     cd_email_usuario: String,
+    fg_admin: Number,
+    qt_advertencias_usuario: Number,
+    fg_usuario_deletado: Number,
 }
 
 export interface IUsuarioContext {
