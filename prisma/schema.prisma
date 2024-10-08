@@ -25,7 +25,7 @@ model campanha {
   sg_estado_campanha        String
   ds_acao_campanha          String
   cd_imagem_campanha        String       @default("default.png")
-  fg_campanha_ativa         Boolean
+  fg_campanha_ativa         Boolean      
 }
 
 model alimento_campanha {

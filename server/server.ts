@@ -247,11 +247,11 @@ const campanhas = async (id: string | null = null) => {
       { $unwind: { path: "$usuario", preserveNullAndEmptyArrays: true } },
       
       // Etapa 4: Filtrar usuários que não foram deletados
-      {
-        $match: {
-          "usuario.fg_usuario_deletado": 0
-        }
-      },
+      // {
+      //   $match: {
+      //     "usuario.fg_usuario_deletado": 0
+      //   }
+      // },
     
       // Etapa 5: Lookup para unir com alimento_campanha
       {
@@ -498,9 +498,9 @@ const insertAlimentosDoacao = async (cdCampanha: string, cdUsuario: string, alim
   
   app.post('/api/campanhas', async (req: Request, res: Response) => {
     const { infos_campanha, alimentos_campanha } = req.body;
-  
+    console.log("info:", infos_campanha);
     const campanhaData = {
-      usuario_id: infos_campanha.usuario_id,
+      usuario_id: new ObjectId(infos_campanha.usuario_id),
       nm_titulo_campanha: infos_campanha.nm_titulo_campanha,
       dt_encerramento_campanha: infos_campanha.dt_encerramento_campanha,
       nm_cidade_campanha: infos_campanha.nm_cidade_campanha,
@@ -514,7 +514,7 @@ const insertAlimentosDoacao = async (cdCampanha: string, cdUsuario: string, alim
       const campanhaId = campanhaInserida.insertedId;
   
       const alimentosToInsert = alimentos_campanha.map((alimento: { _id: any; qt_alimento_meta: any }) => ({
-        alimento_id: alimento._id,
+        alimento_id: new ObjectId(alimento._id),
         campanha_id: campanhaId,
         qt_alimento_meta: alimento.qt_alimento_meta,
       }));

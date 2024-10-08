@@ -236,6 +236,14 @@ export const CriacaoCampanha = () => {
             return;
         }
 
+        console.log("usuario_id: ", user.user._id);
+        console.log("nm_titulo_campanha: ", event.target.nm_titulo_campanha.value);
+        console.log("dt_encerramento_campanha: ", event.target.dt_encerramento_campanha.value);
+        console.log("nm_cidade_campanha: ", event.target.nm_cidade_campanha.value);
+        console.log("sg_estado_campanha: ", event.target.sg_estado_campanha.value);
+        console.log("ds_acao_campanha: ", event.target.ds_acao_campanha.value);
+        console.log("cd_imagem_campanha: ", event.target.cd_imagem_campanha.value);
+
         const infos_campanha = {
             usuario_id: user.user._id,
             nm_titulo_campanha: event.target.nm_titulo_campanha.value,
@@ -243,8 +251,10 @@ export const CriacaoCampanha = () => {
             nm_cidade_campanha: event.target.nm_cidade_campanha.value,
             sg_estado_campanha: event.target.sg_estado_campanha.value,
             ds_acao_campanha: event.target.ds_acao_campanha.value,
-            cd_imagem_campanha: event.target.ds_acao_campanha.value,
+            cd_imagem_campanha: event.target.cd_imagem_campanha.value || "default.png",
         };
+        console.log("Data de Encerramento:", infos_campanha.dt_encerramento_campanha);
+        console.log("infos_campanha:", infos_campanha);
 
         const alimentos_campanha = Array.from({ length: qtAlimentos }, (_, index) => ({
             _id: event.target._id[index].value,

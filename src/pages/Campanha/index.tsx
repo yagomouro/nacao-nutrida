@@ -21,6 +21,7 @@ export const Campanha = () => {
 
   useEffect(() => {
     if(_id){
+    console.log("Teste useEffect")
     axios.get<ICampanhaAlimento[]>(url).then((response) => {
       setCampanha(response.data)
     }).catch((err) => {
