@@ -554,7 +554,7 @@ const insertAlimentosDoacao = async (cdCampanha: string, cdUsuario: string, alim
     try {
       const hashedPassword = await bcrypt.hash(userInfos.cd_senha_usuario, salt);
       userInfos.cd_senha_usuario = hashedPassword;
-  
+      console.log("user: ", userInfos);
       const userResponse = await db.collection('usuario').insertOne(userInfos);
       
       // Como não existe mais o 'ops', utilize o insertedId

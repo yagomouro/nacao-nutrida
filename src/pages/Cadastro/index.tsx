@@ -106,11 +106,14 @@ export const Cadastro = () => {
             ch_documento_usuario: ch_documento_usuario,
             cd_email_usuario: cd_email_usuario,
             nr_celular_usuario: nr_celular_usuario,
-            dt_nascimento_usuario: tipo_usuario === 'pf' ? dt_nascimento_usuario : undefined,
+            dt_nascimento_usuario: tipo_usuario === 'pf' ? dt_nascimento_usuario : '',
             cd_senha_usuario: cd_senha_usuario,
             sg_estado_usuario: sg_estado_usuario,
             nm_cidade_usuario: nm_cidade_usuario,
-            cd_foto_usuario: "default.png"
+            cd_foto_usuario: "default.png",
+            fg_admin: 0,
+            qt_advertencias_usuario: 0,
+            fg_usuario_deletado: 0
         };
 
         console.log(user_infos);

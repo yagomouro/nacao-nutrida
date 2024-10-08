@@ -258,7 +258,7 @@ export const CriacaoCampanha = () => {
         let alimentos_campanha: { _id: string; qt_alimento_meta: number }[] = [];
         console.log("teste 1");
         if (qtAlimentos === 1) {
-            console.log("teste 1");
+            console.log("teste 2");
             console.log('event.target:', event.target);
             console.log('event.target._id:', event.target._id);
             console.log('event.target.qt_alimento_meta:', event.target.qt_alimento_meta);
