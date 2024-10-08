@@ -16,8 +16,8 @@ export const Campanha = () => {
   const user = useContext(UserContext)
 
   const { _id } = useParams();
-
-  const url = `/api/campanhas/${_id}`;
+  console.log("id: ", _id);
+  const url = `/api/campanhas?id=${_id}`;
 
   useEffect(() => {
     if(_id){
