@@ -109,7 +109,8 @@ export const Cadastro = () => {
             dt_nascimento_usuario: tipo_usuario === 'pf' ? dt_nascimento_usuario : undefined,
             cd_senha_usuario: cd_senha_usuario,
             sg_estado_usuario: sg_estado_usuario,
-            nm_cidade_usuario: nm_cidade_usuario
+            nm_cidade_usuario: nm_cidade_usuario,
+            cd_foto_usuario: "default.png"
         };
 
         console.log(user_infos);
