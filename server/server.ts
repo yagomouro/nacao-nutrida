@@ -502,7 +502,7 @@ const insertAlimentosDoacao = async (cdCampanha: string, cdUsuario: string, alim
     const campanhaData = {
       usuario_id: new ObjectId(infos_campanha.usuario_id),
       nm_titulo_campanha: infos_campanha.nm_titulo_campanha,
-      dt_encerramento_campanha: infos_campanha.dt_encerramento_campanha,
+      dt_encerramento_campanha: new Date(infos_campanha.dt_encerramento_campanha),
       nm_cidade_campanha: infos_campanha.nm_cidade_campanha,
       sg_estado_campanha: infos_campanha.sg_estado_campanha,
       ds_acao_campanha: infos_campanha.ds_acao_campanha,

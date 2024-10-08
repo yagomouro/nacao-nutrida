@@ -251,7 +251,7 @@ export const CriacaoCampanha = () => {
             nm_cidade_campanha: event.target.nm_cidade_campanha.value,
             sg_estado_campanha: event.target.sg_estado_campanha.value,
             ds_acao_campanha: event.target.ds_acao_campanha.value,
-            cd_imagem_campanha: event.target.cd_imagem_campanha.value || "default.png",
+            cd_imagem_campanha: event.target.cd_imagem_campanha.value || "1.png",
         };
         console.log("Data de Encerramento:", infos_campanha.dt_encerramento_campanha);
         console.log("infos_campanha:", infos_campanha);
