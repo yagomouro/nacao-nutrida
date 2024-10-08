@@ -255,11 +255,27 @@ export const CriacaoCampanha = () => {
         };
         console.log("Data de Encerramento:", infos_campanha.dt_encerramento_campanha);
         console.log("infos_campanha:", infos_campanha);
+        let alimentos_campanha: { _id: string; qt_alimento_meta: number }[] = [];
+        console.log("teste 1");
+        if (qtAlimentos === 1) {
+            console.log("teste 1");
+            console.log('event.target:', event.target);
+            console.log('event.target._id:', event.target._id);
+            console.log('event.target.qt_alimento_meta:', event.target.qt_alimento_meta);
 
-        const alimentos_campanha = Array.from({ length: qtAlimentos }, (_, index) => ({
-            _id: event.target._id[index].value,
-            qt_alimento_meta: parseInt(event.target.qt_alimento_meta[index].value),
-        }));
+            console.log('Acessando um único alimento:', event.target._id, event.target.qt_alimento_meta);
+            alimentos_campanha.push({
+              _id: event.target._id.value,
+              qt_alimento_meta: parseInt(event.target.qt_alimento_meta.value),
+            });
+          } else {
+            console.log("teste 3");
+            console.log('Acessando múltiplos alimentos:', event.target._id, event.target.qt_alimento_meta);
+            alimentos_campanha = Array.from({ length: qtAlimentos }, (_, index) => ({
+              _id: event.target._id[index].value,
+              qt_alimento_meta: parseInt(event.target.qt_alimento_meta[index].value),
+            }));
+          }
 
         const dbInsert = async () => {
             try {
