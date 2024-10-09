@@ -3,14 +3,11 @@ Repositório do GRUPO 07 do Projeto Interdisciplinar do 3º semestre DSM 2024/2.
 
 # Nação Nutrida
 
-Projeto interdisciplinar DSM 2° SEMESTRE 2024 
-Faculdade: Dr. Thomaz Novelino (Fatec Franca) 
-
 Nosso projeto tem um propósito especial: arrecadar alimentos para doação. Através de doações virtuais, os usuários podem contribuir com alimentos básicos que serão entregues a quem mais precisa.
 
 ## 🚀 Iniciando
 
-Bem-vindo ao Nação Nutrida! Este projeto tem como objetivo arrecadar alimentos para doação através de doações virtuais. Estamos ansiosos para que você contribua para este projeto e ajude a fazer uma diferença na vida das pessoas.
+Bem-vindo ao Nação Nutrida! Estamos ansiosos para que você contribua para este projeto e ajude a fazer uma diferença na vida das pessoas.
 
 ### 📋 Pré-requisitos
 
@@ -26,7 +23,15 @@ npm >= a versão 6.14.13
 npm install
 ```
 
-2. Execute o script para configurar o banco de dados:
+2. Conecte-se ao banco de dados:
+  * Faça uma cópia do do arquivo .env.example
+  * Renomeie-o para .env
+  * Insira a sua string de conexão do mongodb em 'DATABASE_URL' e coloque /nacao-nutrida no final
+
+Exemplo:
+  * DATABASE_URL="mongodb+srv://<Seu_Usuario>:<Sua_Senha>@cluster0.nql6p.mongodb.net/nacao-nutrida"
+
+3. Execute o script para configurar o banco de dados:
   * cd database
   * node popularBanco.js
 
