@@ -24,20 +24,20 @@ npm install
 ```
 
 2. Conecte-se ao banco de dados:
-  * Faça uma cópia do do arquivo .env.example
-  * Renomeie-o para .env
+  * Faça uma cópia do arquivo .env.example
+  * Renomeie a cópia para .env
   * Insira a sua string de conexão do mongodb em 'DATABASE_URL' e coloque /nacao-nutrida no final
 
 Exemplo:
-'''
+```
 DATABASE_URL="mongodb+srv://<Seu_Usuario>:<Sua_Senha>@cluster0.nql6p.mongodb.net/nacao-nutrida"
-'''
+```
 
 3. Execute o script para configurar o banco de dados:
-'''
+```
 cd database
 node popularBanco.js
-'''
+```
 
 ## Executando o projeto
 
