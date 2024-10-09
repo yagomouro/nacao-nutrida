@@ -11,14 +11,12 @@ import { IEstadoCidades } from '../../types/IEstadoCidade';
 export const Descobrir = () => {
   const [campanhas, setCampanhas] = useState<ICampanhaAlimento[]>([])
   const [qtAlimentos, setQtAlimentos] = useState<number>(1)
-  console.log("qtAlimentos 2: ", qtAlimentos);
   const [listaEstadosCidades, setListaEstadosCidades] = useState<IEstadoCidades[]>([])
   const [listaCidades, setListaCidades] = useState<string[]>([])
   const [cidadeSelecionada, setCidadeSelecionada] = useState<string>('')
 
   useEffect(() => {
     axios.get<IEstadoCidades[]>('/api/estadosCidades').then((response) => {
-      console.log("EstadoCidades 6: ", response.data);
       setListaEstadosCidades(response.data)
     }).catch((err) => {
       console.log('Error: ' + err)
@@ -28,7 +26,6 @@ export const Descobrir = () => {
   useEffect(() => {
     if (listaEstadosCidades.length > 0) {
       const cidades = listaEstadosCidades[0]!.cidades;
-      console.log("cidades 7: ", cidades);
       setListaCidades(cidades);
     }
   }, [listaEstadosCidades]);
@@ -36,24 +33,19 @@ export const Descobrir = () => {
   useEffect(() => {
     if (listaCidades.length > 0) {
       const cidade = listaCidades[0]!;
-      console.log("cidade 8: ", cidade);
       setCidadeSelecionada(cidade);
     }
   }, [listaEstadosCidades]);
 
   const handleChangeEstadoSelecionado = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedEstado = event.target.value;
-    console.log("selectedEstado 9: ", selectedEstado);
     const estado = listaEstadosCidades.find(estado => estado.sg_estado === selectedEstado)!.cidades;
-    console.log("estado 10:", estado);
     setListaCidades(estado);
   };
 
   const handleChangeCidadeSelecionada = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectCidade = event.target.value;
-    console.log("selectCidade 11:", selectCidade);
     const cidade = listaCidades.find(cidade => cidade === selectCidade)!;
-    console.log("cidade 11:", cidade);
     setCidadeSelecionada(cidade);
   };
 

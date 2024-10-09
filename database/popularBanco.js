@@ -164,6 +164,17 @@ async function popularBanco() {
               cd_imagem_campanha: "5.png",
               fg_campanha_ativa: false,
             },
+            {
+                usuario_id: usuaria[0]._id, // ID do usuário 1
+                nm_titulo_campanha: "Combate à Desnutrição",
+                dt_encerramento_campanha: new Date('2028-06-30T00:00:00Z'),
+                ts_criacao_campanha: new Date('2024-03-15T19:59:04Z'),
+                nm_cidade_campanha: "Franca",
+                sg_estado_campanha: "SP",
+                ds_acao_campanha: "Nos ajude a eliminar a desnutrição desse país!",
+                cd_imagem_campanha: "3.png",
+                fg_campanha_ativa: false,
+              },
         ];
         
           // Passo 2: Inserir as campanhas no banco de dados
@@ -251,6 +262,16 @@ async function popularBanco() {
                 campanha_id: campanhasa[4]._id, // ID da quinta campanha
                 alimento_id: aliment[5]._id,
                 quantidade: 120,
+            },
+            {
+                campanha_id: campanhasa[5]._id, // ID da quinta campanha
+                alimento_id: aliment[2]._id,
+                quantidade: 150,
+            },
+            {
+                campanha_id: campanhasa[4]._id, // ID da quinta campanha
+                alimento_id: aliment[4]._id,
+                quantidade: 150,
             },
         ];
         

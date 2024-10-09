@@ -1,3 +1,6 @@
+# DSM-G07-PI3-2024-2
+Repositório do GRUPO 07 do Projeto Interdisciplinar do 3º semestre DSM 2024/2. Alunos: Eduardo Gibertoni Camilo, Frederico Pessoa Barbosa, Jorge Luiz Patrocínio dos Santos, Rafael Victor Redoval de Sousa, Yago Raphael de Melo Mouro.
+
 # Nação Nutrida
 
 Projeto interdisciplinar DSM 2° SEMESTRE 2024 
@@ -14,22 +17,18 @@ Bem-vindo ao Nação Nutrida! Este projeto tem como objetivo arrecadar alimentos
 ```
 Node.js >=  a versão 14.17.0
 npm >= a versão 6.14.13
-MySQL 8.0
 ```
 
 ### 🔧 Instalação
 
 1. Instale as dependências do projeto:
 ```
-1. npm install
-2. npm install typescript
+npm install
 ```
 
-2. Instale o MySQL 8.0:
-  * [Tutorial de instalação](https://www.youtube.com/watch?v=fmerTu7dWk8)
-3. Execute o script SQL para configurar o banco de dados:
-  * Localize o arquivo 'popularBanco.sql' no diretório '/database'
-  * Rode o script no MySQL para criar as tabelas e inserir os dados necessários
+2. Execute o script para configurar o banco de dados:
+  * cd database
+  * node popularBanco.js
 
 ## Executando o projeto
 
@@ -50,7 +49,7 @@ npm run dev
 
 * [Typescript](https://www.typescriptlang.org/)
 * [React](https://react.dev/)
-* [MySQL 8.0](https://www.youtube.com/watch?v=fmerTu7dWk8)
+* [MongoDB](https://www.youtube.com/watch?v=fmerTu7dWk8)
 
 
 ## 📌 Versão
@@ -61,9 +60,9 @@ Versão atual 0.0.3
 
 <img src="public/assets/modelagem banco/modelagemConceitual.png">
 
-## Modelagem Lógica
+## Diagrama NoAM
 
-<img src="public/assets/modelagem banco/modelagemLogica.png">
+<img src="docs/NoAM.png">
 
 ## ✒️ Autores
 
@@ -71,6 +70,7 @@ Versão atual 0.0.3
 * **Leonardo Victor** - (https://github.com/Leovpf)
 * **Rafael Victor** - (https://github.com/rafaelVictor05)
 * **Jorge Patrocinio** - (https://github.com/jorgesantos001)
+* **Eduardo Gibertoni** - (https://github.com/EduardoGibertoniCamillo)
 
 
 ## 🎁 Agradecimentos

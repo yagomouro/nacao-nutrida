@@ -19,13 +19,12 @@ export const Campanha = () => {
   const url = `/api/campanhas?id=${_id}`;
 
   useEffect(() => {
-    if(_id){
     axios.get<ICampanhaAlimento[]>(url).then((response) => {
       setCampanha(response.data)
     }).catch((err) => {
       console.log('Error: ' + err)
     })
-  }}, [_id])
+  }, [_id])
 
   const [modalVisible, setModalVisible] = useState(false);
 

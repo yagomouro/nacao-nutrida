@@ -363,7 +363,7 @@ const campanhas = async (id: string | null = null) => {
       // Etapa 10: Ordenar por data de criação da campanha
       {
         $sort: {
-          ts_criacao_campanha: -1
+          dt_encerramento_campanha: -1
         }
       }
     ]).toArray();
