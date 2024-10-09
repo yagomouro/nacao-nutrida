@@ -511,21 +511,40 @@ const insertAlimentosDoacao = async (cdCampanha: string, cdUsuario: string, alim
     try {
       const campanhaInserida = await db.collection('campanha').insertOne(campanhaData);
       const campanhaId = campanhaInserida.insertedId;
+      let alimentosToInsert;
+      let alimentosResponse;
+      let inserted;
   
-      const alimentosToInsert = alimentos_campanha.map((alimento: { _id: any; qt_alimento_meta: any }) => ({
-        alimento_id: new ObjectId(alimento._id),
-        campanha_id: campanhaId,
-        qt_alimento_meta: alimento.qt_alimento_meta,
-      }));
+      // Verifica se alimentos_campanha é um array, caso contrário, transforma em array
+      const alimentosArray = Array.isArray(alimentos_campanha) ? alimentos_campanha : [alimentos_campanha];
   
-      const alimentosResponse = await db.collection('alimento_campanha').insertMany(alimentosToInsert);
+      // Se só tem um alimento, cadastra com insertOne, se tem mais de um, cadastra com insertMany
+      if (alimentosArray.length === 1) {
+        const alimento = alimentosArray[0];
+        alimentosToInsert = {
+          alimento_id: new ObjectId(alimento._id),
+          campanha_id: campanhaId,
+          qt_alimento_meta: alimento.qt_alimento_meta,
+        };
+        alimentosResponse = await db.collection('alimento_campanha').insertOne(alimentosToInsert);
+        inserted = 1;
+      } else {
+        alimentosToInsert = alimentosArray.map((alimento: { _id: any; qt_alimento_meta: any }) => ({
+          alimento_id: new ObjectId(alimento._id),
+          campanha_id: campanhaId,
+          qt_alimento_meta: alimento.qt_alimento_meta,
+        }));
+        alimentosResponse = await db.collection('alimento_campanha').insertMany(alimentosToInsert);
+        inserted = alimentosResponse.insertedCount;
+      }
   
-      res.json({ campanhaId, alimentosInserted: alimentosResponse.insertedCount });
+      res.json({ campanhaId, alimentosInserted: inserted });
     } catch (error) {
       console.error('Error while inserting campanha:', error);
       res.status(500).json({ message: 'Error while inserting campanha' });
     }
   });
+  
   
   app.post('/api/doacoes', async (req: Request, res: Response) => {
     const { infos_doacao, alimentos_doacao } = req.body;

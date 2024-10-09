@@ -217,13 +217,20 @@ export const CriacaoCampanha = () => {
             return false;
         }
 
-        for (let i = 0; i < qtAlimentos; i++) {
-            if (!event.target._id[i].value || !event.target.qt_alimento_meta[i].value) {
+        if (qtAlimentos === 1) {
+            if (!event.target._id.value || !event.target.qt_alimento_meta.value) {
                 alert("Todos os campos de alimento devem ser preenchidos");
                 return false;
             }
+        } else {
+            for (let i = 0; i < qtAlimentos; i++) {
+                if (!event.target._id[i].value || !event.target.qt_alimento_meta[i].value) {
+                    alert("Todos os campos de alimento devem ser preenchidos");
+                    return false;
+                }
+            }
         }
-
+    
         return true;
     };
 
@@ -231,18 +238,10 @@ export const CriacaoCampanha = () => {
         event.preventDefault();
 
         const qtAlimentos = parseInt(event.target.qt_alimentos.value);
-
+        console.log("qtAlimentos: ", qtAlimentos);
         if (!validateCampanha(event, qtAlimentos)) {
             return;
         }
-
-        console.log("usuario_id: ", user.user._id);
-        console.log("nm_titulo_campanha: ", event.target.nm_titulo_campanha.value);
-        console.log("dt_encerramento_campanha: ", event.target.dt_encerramento_campanha.value);
-        console.log("nm_cidade_campanha: ", event.target.nm_cidade_campanha.value);
-        console.log("sg_estado_campanha: ", event.target.sg_estado_campanha.value);
-        console.log("ds_acao_campanha: ", event.target.ds_acao_campanha.value);
-        console.log("cd_imagem_campanha: ", event.target.cd_imagem_campanha.value);
 
         const infos_campanha = {
             usuario_id: user.user._id,
@@ -253,24 +252,13 @@ export const CriacaoCampanha = () => {
             ds_acao_campanha: event.target.ds_acao_campanha.value,
             cd_imagem_campanha: event.target.cd_imagem_campanha.value || "1.png",
         };
-        console.log("Data de Encerramento:", infos_campanha.dt_encerramento_campanha);
-        console.log("infos_campanha:", infos_campanha);
         let alimentos_campanha: { _id: string; qt_alimento_meta: number }[] = [];
-        console.log("teste 1");
         if (qtAlimentos === 1) {
-            console.log("teste 2");
-            console.log('event.target:', event.target);
-            console.log('event.target._id:', event.target._id);
-            console.log('event.target.qt_alimento_meta:', event.target.qt_alimento_meta);
-
-            console.log('Acessando um único alimento:', event.target._id, event.target.qt_alimento_meta);
             alimentos_campanha.push({
               _id: event.target._id.value,
               qt_alimento_meta: parseInt(event.target.qt_alimento_meta.value),
             });
           } else {
-            console.log("teste 3");
-            console.log('Acessando múltiplos alimentos:', event.target._id, event.target.qt_alimento_meta);
             alimentos_campanha = Array.from({ length: qtAlimentos }, (_, index) => ({
               _id: event.target._id[index].value,
               qt_alimento_meta: parseInt(event.target.qt_alimento_meta[index].value),

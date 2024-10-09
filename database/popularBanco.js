@@ -112,7 +112,7 @@ async function popularBanco() {
             {
               usuario_id: usuaria[0]._id, // ID do usuário 1
               nm_titulo_campanha: "Campanha da Solidariedade",
-              dt_encerramento_campanha: new Date('2024-10-10T00:00:00Z'),
+              dt_encerramento_campanha: new Date('2027-10-10T00:00:00Z'),
               ts_criacao_campanha: new Date('2024-03-15T19:59:04Z'),
               nm_cidade_campanha: "São Paulo",
               sg_estado_campanha: "SP",
@@ -123,7 +123,7 @@ async function popularBanco() {
             {
               usuario_id: usuaria[1]._id, // ID do usuário 2
               nm_titulo_campanha: "Ajude a Alimentar Famílias",
-              dt_encerramento_campanha: new Date('2024-08-15T00:00:00Z'),
+              dt_encerramento_campanha: new Date('2026-08-15T00:00:00Z'),
               ts_criacao_campanha: new Date('2024-03-15T19:59:04Z'),
               nm_cidade_campanha: "Rio de Janeiro",
               sg_estado_campanha: "RJ",

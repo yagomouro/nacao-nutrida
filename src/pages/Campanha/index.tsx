@@ -11,20 +11,15 @@ import { UserContext } from '../../contexts/userContext';
 
 
 export const Campanha = () => {
-  console.log("teste pagina campanha");
   const navigate = useNavigate()
   const [campanha, setCampanha] = useState<ICampanhaAlimento[]>([])
   const user = useContext(UserContext)
 
   const { _id } = useParams();
-  console.log("id: ", _id);
   const url = `/api/campanhas?id=${_id}`;
-  console.log("url: ", url);
 
   useEffect(() => {
-    console.log("teste useEffect 2");
     if(_id){
-    console.log("Teste useEffect");
     axios.get<ICampanhaAlimento[]>(url).then((response) => {
       setCampanha(response.data)
     }).catch((err) => {
@@ -74,7 +69,7 @@ export const Campanha = () => {
     event.preventDefault();
 
     let infos_doacao = {
-      _id_doacao: user.user._id,
+      usuario_doacao: user.user._id,
       cd_campanha_doacao: _id,
     }
 
@@ -83,12 +78,12 @@ export const Campanha = () => {
     let lengthAlimentos = campanha[0].alimentos.length
 
     let alimentos_doacao = Array.from({ length: lengthAlimentos }, (_, index) => {
-      const _id = event.target._id[index].value;
+      const alimento_id = event.target._id[index].value;
       const qt_alimento_doacao = parseInt(event.target.qt_alimento_doacao[index].value);
 
       if (qt_alimento_doacao > 0) {
         return {
-          _id,
+          alimento_id,
           qt_alimento_doacao
         };
       } else {

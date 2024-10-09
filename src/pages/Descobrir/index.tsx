@@ -121,7 +121,7 @@ export const Descobrir = () => {
           <h1 className="titulo black">Campanhas mais recentes</h1>
           <div className="campanhas row">
             {campanhas.map((campanha) => (
-              <Link key={campanha._id} className="campanha-link" to={`campanhas/${campanha._id}`}>
+              <Link key={campanha._id} className="campanha-link" to={`/campanhas/${campanha._id.toString()}`}>
                 <div className="campanha">
                   <div className="imagem-campanha">
                     <img src={`/assets/campanhas/${campanha.cd_imagem_campanha}`} alt="" />
