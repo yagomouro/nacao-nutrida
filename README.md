@@ -48,8 +48,7 @@ npm run start
 ```
 
 Back-End: 
-1. É necessário entrar na pasta '/server' e rodar o script
-2. Execute o servidor:
+1. Na pasta server, execute:
 ```
 npm run dev
 ```
@@ -58,7 +57,7 @@ npm run dev
 
 * [Typescript](https://www.typescriptlang.org/)
 * [React](https://react.dev/)
-* [MongoDB](https://www.youtube.com/watch?v=fmerTu7dWk8)
+* [MongoDB](https://www.mongodb.com/pt-br)
 
 
 ## 📌 Versão
