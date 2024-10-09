@@ -498,7 +498,6 @@ const insertAlimentosDoacao = async (cdCampanha: string, cdUsuario: string, alim
   
   app.post('/api/campanhas', async (req: Request, res: Response) => {
     const { infos_campanha, alimentos_campanha } = req.body;
-    console.log("info:", infos_campanha);
     const campanhaData = {
       usuario_id: new ObjectId(infos_campanha.usuario_id),
       nm_titulo_campanha: infos_campanha.nm_titulo_campanha,

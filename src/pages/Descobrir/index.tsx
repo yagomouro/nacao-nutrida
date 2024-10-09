@@ -10,15 +10,11 @@ import { IEstadoCidades } from '../../types/IEstadoCidade';
 
 export const Descobrir = () => {
   const [campanhas, setCampanhas] = useState<ICampanhaAlimento[]>([])
-  console.log("campanhas 1: ", campanhas);
   const [qtAlimentos, setQtAlimentos] = useState<number>(1)
   console.log("qtAlimentos 2: ", qtAlimentos);
   const [listaEstadosCidades, setListaEstadosCidades] = useState<IEstadoCidades[]>([])
-  console.log("listaEstadosCidades 3: ", listaEstadosCidades);
   const [listaCidades, setListaCidades] = useState<string[]>([])
-  console.log("listaCidades 4: ", listaCidades);
   const [cidadeSelecionada, setCidadeSelecionada] = useState<string>('')
-  console.log("cidadeSelecionada 5: ", cidadeSelecionada);
 
   useEffect(() => {
     axios.get<IEstadoCidades[]>('/api/estadosCidades').then((response) => {

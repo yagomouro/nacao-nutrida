@@ -11,6 +11,7 @@ import { UserContext } from '../../contexts/userContext';
 
 
 export const Campanha = () => {
+  console.log("teste pagina campanha");
   const navigate = useNavigate()
   const [campanha, setCampanha] = useState<ICampanhaAlimento[]>([])
   const user = useContext(UserContext)
@@ -18,10 +19,12 @@ export const Campanha = () => {
   const { _id } = useParams();
   console.log("id: ", _id);
   const url = `/api/campanhas?id=${_id}`;
+  console.log("url: ", url);
 
   useEffect(() => {
+    console.log("teste useEffect 2");
     if(_id){
-    console.log("Teste useEffect")
+    console.log("Teste useEffect");
     axios.get<ICampanhaAlimento[]>(url).then((response) => {
       setCampanha(response.data)
     }).catch((err) => {

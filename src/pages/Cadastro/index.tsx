@@ -106,7 +106,7 @@ export const Cadastro = () => {
             ch_documento_usuario: ch_documento_usuario,
             cd_email_usuario: cd_email_usuario,
             nr_celular_usuario: nr_celular_usuario,
-            dt_nascimento_usuario: tipo_usuario === 'pf' ? dt_nascimento_usuario : '',
+            dt_nascimento_usuario: tipo_usuario === 'pf' ? dt_nascimento_usuario : 'PJ',
             cd_senha_usuario: cd_senha_usuario,
             sg_estado_usuario: sg_estado_usuario,
             nm_cidade_usuario: nm_cidade_usuario,
