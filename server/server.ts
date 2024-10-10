@@ -71,12 +71,10 @@ const campanhas = async (id: string | null = null) => {
       // Etapa 1: Filtrar campanhas não deletadas e ainda ativas, além de verificar o ID da campanha
       {
         $match: {
-          dt_encerramento_campanha: { $gt: new Date() }, // Data de encerramento maior que a atual
-          _id: new ObjectId(id) // Filtrar pelo ID da campanha
+          dt_encerramento_campanha: { $gt: new Date() },
+          _id: new ObjectId(id)
         }
       },
-    
-      // Etapa 2: Realizar o lookup para unir com a coleção de usuários
       {
         $lookup: {
           from: 'usuario',
@@ -85,18 +83,12 @@ const campanhas = async (id: string | null = null) => {
           as: 'usuario'
         }
       },
-    
-      // Etapa 3: Desestruturar o array de usuários (equivalente ao LEFT JOIN)
       { $unwind: { path: "$usuario", preserveNullAndEmptyArrays: true } },
-    
-      // Etapa 4: Filtrar usuários que não foram deletados
       {
         $match: {
           "usuario.fg_usuario_deletado": 0
         }
       },
-    
-      // Etapa 5: Lookup para unir com alimento_campanha
       {
         $lookup: {
           from: 'alimento_campanha',
@@ -106,8 +98,6 @@ const campanhas = async (id: string | null = null) => {
         }
       },
       { $unwind: { path: "$alimentosCampanha", preserveNullAndEmptyArrays: true } },
-    
-      // Etapa 6: Lookup para unir com alimento_doacao (subquery de doações agregadas)
       {
         $lookup: {
           from: 'alimento_doacao',
@@ -129,8 +119,6 @@ const campanhas = async (id: string | null = null) => {
         }
       },
       { $unwind: { path: "$doacoesAgregadas", preserveNullAndEmptyArrays: true } },
-    
-      // Etapa 7: Lookup para unir com alimento (detalhes dos alimentos)
       {
         $lookup: {
           from: 'alimento',
@@ -139,11 +127,7 @@ const campanhas = async (id: string | null = null) => {
           as: 'detalhesAlimentos'
         }
       },
-    
-      // Etapa 8: Desestruturar alimentosCampanha e detalhes dos alimentos para facilitar a junção
       { $unwind: { path: "$detalhesAlimentos", preserveNullAndEmptyArrays: true } },
-    
-      // Etapa 9: Calcular os campos de tempo restantes (minutos, horas, dias, meses, anos)
       {
         $addFields: {
           minutos_restantes: {
@@ -183,8 +167,6 @@ const campanhas = async (id: string | null = null) => {
           }
         }
       },
-    
-      // Etapa 10: Agrupar a campanha e calcular os valores totais de alimentos e doações
       {
         $group: {
           _id: "$_id",
@@ -209,7 +191,7 @@ const campanhas = async (id: string | null = null) => {
               nm_alimento: "$detalhesAlimentos.nm_alimento",
               cd_alimento: "$detalhesAlimentos._id",
               sg_medida_alimento: "$detalhesAlimentos.sg_medida_alimento",
-              qt_alimento_meta: "$alimentosCampanha.qt_alimento_meta",
+              qt_alimento_meta: "$alimentosCampanha.qt_alimento_meta",  // Incluindo qt_alimento_meta
               qt_alimento_doado: { $ifNull: [{ $sum: "$doacoesAgregadas.qt_alimento_doado" }, 0] }
             }
           }
@@ -354,7 +336,9 @@ const campanhas = async (id: string | null = null) => {
           alimentos: {
             $push: {
               nm_alimento: "$detalhesAlimentos.nm_alimento",
-              sg_medida_alimento: "$detalhesAlimentos.sg_medida_alimento"
+              sg_medida_alimento: "$detalhesAlimentos.sg_medida_alimento",
+              qt_alimento_meta: "$alimentosCampanha.qt_alimento_meta",  // Incluindo qt_alimento_meta
+              qt_alimento_doado: { $ifNull: [{ $sum: "$doacoes.qt_alimento_doado" }, 0] }
             }
           }
         }

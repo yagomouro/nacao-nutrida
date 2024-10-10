@@ -191,87 +191,87 @@ async function popularBanco() {
             {
                 campanha_id: campanhasa[0]._id, 
                 alimento_id: aliment[0]._id, 
-                quantidade: 100,
+                qt_alimento_meta: 100,
             },
             {
                 campanha_id: campanhasa[0]._id, // ID da primeira campanha
                 alimento_id: aliment[1]._id,
-                quantidade: 50,
+                qt_alimento_meta: 50,
             },
             {
                 campanha_id: campanhasa[0]._id, // ID da primeira campanha
                 alimento_id: aliment[2]._id,
-                quantidade: 200,
+                qt_alimento_meta: 200,
             },
             {
                 campanha_id: campanhasa[1]._id, // ID da segunda campanha
                 alimento_id: aliment[3]._id,
-                quantidade: 150,
+                qt_alimento_meta: 150,
             },
             {
                 campanha_id: campanhasa[1]._id, // ID da segunda campanha
                 alimento_id: aliment[4]._id,
-                quantidade: 80,
+                qt_alimento_meta: 80,
             },
             {
                 campanha_id: campanhasa[1]._id, // ID da segunda campanha
                 alimento_id: aliment[5]._id,
-                quantidade: 120,
+                qt_alimento_meta: 120,
             },
             {
                 campanha_id: campanhasa[2]._id, // ID da terceira campanha
                 alimento_id: aliment[6]._id,
-                quantidade: 120,
+                qt_alimento_meta: 120,
             },
             {
                 campanha_id: campanhasa[2]._id, // ID da terceira campanha
                 alimento_id: aliment[7]._id,
-                quantidade: 90,
+                qt_alimento_meta: 90,
             },
             {
                 campanha_id: campanhasa[2]._id, // ID da terceira campanha
                 alimento_id: aliment[8]._id,
-                quantidade: 180,
+                qt_alimento_meta: 180,
             },
             {
                 campanha_id: campanhasa[3]._id, // ID da quarta campanha
                 alimento_id: aliment[9]._id,
-                quantidade: 100,
+                qt_alimento_meta: 100,
             },
             {
                 campanha_id: campanhasa[3]._id, // ID da quarta campanha
                 alimento_id: aliment[10]._id,
-                quantidade: 50,
+                qt_alimento_meta: 50,
             },
             {
                 campanha_id: campanhasa[3]._id, // ID da quarta campanha
                 alimento_id: aliment[11]._id,
-                quantidade: 200,
+                qt_alimento_meta: 200,
             },
             {
                 campanha_id: campanhasa[4]._id, // ID da quinta campanha
                 alimento_id: aliment[3]._id,
-                quantidade: 150,
+                qt_alimento_meta: 150,
             },
             {
                 campanha_id: campanhasa[4]._id, // ID da quinta campanha
                 alimento_id: aliment[4]._id,
-                quantidade: 80,
+                qt_alimento_meta: 80,
             },
             {
                 campanha_id: campanhasa[4]._id, // ID da quinta campanha
                 alimento_id: aliment[5]._id,
-                quantidade: 120,
+                qt_alimento_meta: 120,
             },
             {
                 campanha_id: campanhasa[5]._id, // ID da quinta campanha
                 alimento_id: aliment[2]._id,
-                quantidade: 150,
+                qt_alimento_meta: 150,
             },
             {
                 campanha_id: campanhasa[4]._id, // ID da quinta campanha
                 alimento_id: aliment[4]._id,
-                quantidade: 150,
+                qt_alimento_meta: 150,
             },
         ];
         
