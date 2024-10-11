@@ -543,6 +543,33 @@ const insertAlimentosDoacao = async (cdCampanha: string, cdUsuario: string, alim
       }));
   
       const response = await db.collection('alimento_doacao').insertMany(alimentosToInsert);
+
+      for (const alimento of alimentos_doacao) {
+        if (!alimento || !alimento._id) {
+          console.error(`Alimento inválido: ${JSON.stringify(alimento)}`);
+          continue; // Ignora alimentos inválidos
+        }
+      
+        if (typeof alimento.qt_alimento_doado !== 'number' || isNaN(alimento.qt_alimento_doado)) {
+          console.error(`Quantidade inválida de alimento ${alimento._id}: ${alimento.qt_alimento_doado}`);
+          continue; // Ignora doações com quantidade inválida
+        }
+      
+        try {
+          await db.collection('campanha').updateOne(
+            { _id: cd_campanha_doacao, "alimentos.cd_alimento": alimento._id },
+            {
+              $inc: {
+                "alimentos.$.qt_alimento_doado": alimento.qt_alimento_doado,
+                qt_doacoes_campanha: alimento.qt_alimento_doado
+              }
+            }
+          );
+        } catch (error) {
+          console.error(`Erro ao atualizar a campanha para o alimento ${alimento._id}:`, error);
+        }
+      }
+
       res.json({ insertedCount: response.insertedCount });
     } catch (error) {
       console.error('Error while processing doacoes:', error);

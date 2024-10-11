@@ -83,19 +83,17 @@ export const Campanha = () => {
 
     let lengthAlimentos = campanha?.alimentos?.length || 0;
 
-    let alimentos_doacao = Array.from({ length: lengthAlimentos }, (_, index) => {
-      const alimento_id = event.target._id[index].value;
-      const qt_alimento_doacao = parseInt(event.target.qt_alimento_doacao[index].value);
+    let alimentos_doacao = Array.isArray(campanha?.alimentos) 
+      ? Array.from({ length: lengthAlimentos }, (_, index) => {
+        const alimento_id = event.target._id[index]?.value || event.target._id.value;
+        const qt_alimento_doacao = parseInt(event.target.qt_alimento_doacao[index]?.value || event.target.qt_alimento_doacao.value);
 
       if (qt_alimento_doacao > 0) {
-        return {
-          alimento_id,
-          qt_alimento_doacao
-        };
-      } else {
-        return null;
+        return { alimento_id, qt_alimento_doacao };
       }
-    }).filter(item => item !== null);
+      return null;
+      }).filter(item => item !== null)
+      : [];
 
     console.log(alimentos_doacao)
 
