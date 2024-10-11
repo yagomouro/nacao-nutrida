@@ -189,7 +189,7 @@ const campanhas = async (id: string | null = null) => {
           alimentos: {
             $push: {
               nm_alimento: "$detalhesAlimentos.nm_alimento",
-              cd_alimento: "$detalhesAlimentos._id",
+              alimento_id: "$detalhesAlimentos._id",
               sg_medida_alimento: "$detalhesAlimentos.sg_medida_alimento",
               qt_alimento_meta: "$alimentosCampanha.qt_alimento_meta",  // Incluindo qt_alimento_meta
               qt_alimento_doado: { $ifNull: [{ $sum: "$doacoesAgregadas.qt_alimento_doado" }, 0] }
@@ -336,6 +336,7 @@ const campanhas = async (id: string | null = null) => {
           alimentos: {
             $push: {
               nm_alimento: "$detalhesAlimentos.nm_alimento",
+              alimento_id: "$detalhesAlimentos._id",
               sg_medida_alimento: "$detalhesAlimentos.sg_medida_alimento",
               qt_alimento_meta: "$alimentosCampanha.qt_alimento_meta",  // Incluindo qt_alimento_meta
               qt_alimento_doado: { $ifNull: [{ $sum: "$doacoes.qt_alimento_doado" }, 0] }
@@ -535,33 +536,33 @@ const insertAlimentosDoacao = async (cdCampanha: string, cdUsuario: string, alim
     const { cd_usuario_doacao, cd_campanha_doacao } = infos_doacao;
   
     try {
-      const alimentosToInsert = alimentos_doacao.map((alimento: { _id: any; qt_alimento_doado: any }) => ({
-        usuario_id: cd_usuario_doacao,
-        alimento_id: alimento._id,
-        campanha_id: cd_campanha_doacao,
-        qt_alimento_doado: alimento.qt_alimento_doado,
+      const alimentosToInsert = alimentos_doacao.map((alimento: any) => ({
+        usuario_id: infos_doacao.usuario_id,
+        alimento_id: new ObjectId(alimento.alimento_id),
+        campanha_id: new ObjectId(cd_campanha_doacao),
+        qt_alimento_doado: alimento.qt_alimento_doacao,
       }));
   
       const response = await db.collection('alimento_doacao').insertMany(alimentosToInsert);
 
       for (const alimento of alimentos_doacao) {
-        if (!alimento || !alimento._id) {
+        if (!alimento || !alimento.alimento_id) {
           console.error(`Alimento inválido: ${JSON.stringify(alimento)}`);
           continue; // Ignora alimentos inválidos
         }
       
-        if (typeof alimento.qt_alimento_doado !== 'number' || isNaN(alimento.qt_alimento_doado)) {
+        if (typeof alimento.qt_alimento_doacao !== 'number' || isNaN(alimento.qt_alimento_doacao)) {
           console.error(`Quantidade inválida de alimento ${alimento._id}: ${alimento.qt_alimento_doado}`);
           continue; // Ignora doações com quantidade inválida
         }
       
         try {
           await db.collection('campanha').updateOne(
-            { _id: cd_campanha_doacao, "alimentos.cd_alimento": alimento._id },
+            { _id: new ObjectId(cd_campanha_doacao), "alimentos.alimento_id": new ObjectId(alimento.alimento_id) },
             {
               $inc: {
-                "alimentos.$.qt_alimento_doado": alimento.qt_alimento_doado,
-                qt_doacoes_campanha: alimento.qt_alimento_doado
+                "alimentos.$.qt_alimento_doado": alimento.qt_alimento_doacao,
+                qt_doacoes_campanha: alimento.qt_alimento_doacao
               }
             }
           );

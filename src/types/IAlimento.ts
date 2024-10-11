@@ -13,5 +13,6 @@ export interface IAlimentoLista {
 export interface IAlimentoDoado extends IAlimento {
     qt_alimento_meta: number,
     qt_alimento_doado: number,
+    alimento_id: string,
 }
 

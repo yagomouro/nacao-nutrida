@@ -21,8 +21,6 @@ export const Campanha = () => {
   useEffect(() => {
     if(_id){
     axios.get<ICampanhaAlimento>(url).then((response) => {
-      console.log("campanha: ", response.data);
-      console.log("titulo: ", response.data.nm_titulo_campanha);
 
       let campanhaData = response.data;
       campanhaData.alimentos = Array.isArray(campanhaData.alimentos) ? campanhaData.alimentos : [campanhaData.alimentos];
@@ -160,7 +158,7 @@ export const Campanha = () => {
                     <div className="alimento-quantidade">
                       <div className="qtdAl">
                         <input className="input-form" type="number" name={`qt_alimento_doacao`} min="0" />
-                        <input type="hidden" name={`_id`} value={alimento._id} />
+                        <input type="hidden" name={`_id`} value={alimento.alimento_id} />
                         <h1 className="sub titulo">{alimento.sg_medida_alimento}</h1>
                       </div>
                     </div>
