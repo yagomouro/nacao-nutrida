@@ -6,31 +6,8 @@ import { fetchEstadosCidades } from './config/IbgeApi';
 const bcrypt = require('bcrypt');
 const app = express();
 
-import { MongoClient, Db } from 'mongodb';
-import { campanha } from '@prisma/client';
-
-const databaseUrl = process.env.DATABASE_URL!;
-if (!databaseUrl) {
-  throw new Error("DATABASE_URL is not defined in the environment variables.");
-}
-const client = new MongoClient(databaseUrl);
-
-async function connectToDatabase() {
-    try {
-        await client.connect();
-        console.log('Connected to database');
-        return client.db('nacao-nutrida'); // Nome do seu banco de dados
-    } catch (err) {
-        console.error('Failed to connect to the database:', err);
-        throw err;
-    }
-}
-
-let db: Db;
-
-(async () => {
-    db = await connectToDatabase();
-})();
+const { PrismaClient } = require('@prisma/client');
+const prisma = new PrismaClient();
 
 interface IAlimentoInsert {
     _id: string;
@@ -58,8 +35,8 @@ const salt = bcrypt.genSaltSync(12);
 
 // Função para buscar todos os usuários
 const usuarios = async () => {
-    const query = await db.collection('usuario').find({}).toArray(); 
-    return query;
+  const query = await prisma.usuario.findMany(); 
+  return query;
 }
 
 // Função para retornar campanhas

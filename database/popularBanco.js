@@ -66,7 +66,7 @@ async function popularBanco() {
             { 
               nm_usuario: 'Yago Silva', 
               ch_cpf_usuario: '12345678901', 
-              dt_nascimento_usuario: new Date('1990-05-15'), 
+              dt_nascimento_usuario: new Date("1990-05-15"), 
               nr_celular_usuario: '11987654321', 
               sg_estado_usuario: 'SP', 
               nm_cidade_usuario: 'São Paulo', 
@@ -316,7 +316,7 @@ console.log(dataNascimento); // Verifique se está retornando uma data válida
           ];
         
           // Passo 3: Inserir os alimentos da campanha no banco de dados
-          await prisma.alimentoCampanha.createMany({
+          await prisma.alimento_campanha.createMany({
             data: alimentos_campanha,
           });
         
@@ -417,7 +417,7 @@ console.log(dataNascimento); // Verifique se está retornando uma data válida
           ];
         
           // Passo 3: Inserir as doações de alimento no banco de dados
-          await prisma.alimentoDoacao.createMany({
+          await prisma.alimento_doacao.createMany({
             data: alimento_doacao,
           });
         
