@@ -41,7 +41,7 @@ model usuario {
   nm_usuario                String
   ch_cpf_usuario            String?    @unique
   ch_cnpj_usuario           String?    @unique
-  dt_nascimento_usuario     DateTime
+  dt_nascimento_usuario     DateTime?
   nr_celular_usuario        String
   sg_estado_usuario         String
   nm_cidade_usuario         String
