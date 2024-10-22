@@ -44,328 +44,200 @@ const campanhas = async (id: string | null = null) => {
   const now = new Date();
 
   if (id) {
-    const campanhas = await db.collection('campanha').aggregate([
-      // Etapa 1: Filtrar campanhas não deletadas e ainda ativas, além de verificar o ID da campanha
-      {
-        $match: {
-          dt_encerramento_campanha: { $gt: new Date() },
-          _id: new ObjectId(id)
-        }
+    const campanhas = await prisma.campanha.findMany({
+      where: {
+        dt_encerramento_campanha: {
+          gt: new Date(), // Filtra campanhas ativas
+        },
+        id: id, // Verifica o ID da campanha
       },
-      {
-        $lookup: {
-          from: 'usuario',
-          localField: 'usuario_id',
-          foreignField: '_id',
-          as: 'usuario'
-        }
-      },
-      { $unwind: { path: "$usuario", preserveNullAndEmptyArrays: true } },
-      {
-        $match: {
-          "usuario.fg_usuario_deletado": 0
-        }
-      },
-      {
-        $lookup: {
-          from: 'alimento_campanha',
-          localField: '_id',
-          foreignField: 'campanha_id',
-          as: 'alimentosCampanha'
-        }
-      },
-      { $unwind: { path: "$alimentosCampanha", preserveNullAndEmptyArrays: true } },
-      {
-        $lookup: {
-          from: 'alimento_doacao',
-          let: { campanhaId: "$_id" },
-          pipeline: [
-            {
-              $match: {
-                $expr: { $eq: ["$campanha_id", "$$campanhaId"] }
-              }
+      include: {
+        usuario: {
+          where: {
+            fg_usuario_deletado: 0, // Filtra usuários não deletados
+          },
+          select: {
+            nm_usuario: true,
+            cd_foto_usuario: true,
+          },
+        },
+        alimentosCampanha: {
+          include: {
+            alimento: {
+              select: {
+                nm_alimento: true,
+                sg_medida_alimento: true,
+                id: true,
+              },
             },
-            {
-              $group: {
-                _id: { campanha_id: "$campanha_id", alimento_id: "$alimento_id" },
-                qt_alimento_doado: { $sum: "$qt_alimento_doado" }
-              }
-            }
-          ],
-          as: 'doacoesAgregadas'
-        }
+            doacoes: {
+              select: {
+                alimento_id: true,
+                campanha_id: true,
+                qt_alimento_doado: true,
+              },
+            },
+          },
+        },
       },
-      { $unwind: { path: "$doacoesAgregadas", preserveNullAndEmptyArrays: true } },
-      {
-        $lookup: {
-          from: 'alimento',
-          localField: 'alimentosCampanha.alimento_id',
-          foreignField: '_id',
-          as: 'detalhesAlimentos'
-        }
-      },
-      { $unwind: { path: "$detalhesAlimentos", preserveNullAndEmptyArrays: true } },
-      {
-        $addFields: {
-          minutos_restantes: {
-            $dateDiff: {
-              startDate: new Date(),
-              endDate: { $toDate: "$dt_encerramento_campanha" },
-              unit: "minute"
-            }
-          },
-          horas_restantes: {
-            $dateDiff: {
-              startDate: new Date(),
-              endDate: { $toDate: "$dt_encerramento_campanha" },
-              unit: "hour"
-            }
-          },
-          dias_restantes: {
-            $dateDiff: {
-              startDate: new Date(),
-              endDate: { $toDate: "$dt_encerramento_campanha" },
-              unit: "day"
-            }
-          },
-          meses_restantes: {
-            $dateDiff: {
-              startDate: new Date(),
-              endDate: { $toDate: "$dt_encerramento_campanha" },
-              unit: "month"
-            }
-          },
-          anos_restantes: {
-            $dateDiff: {
-              startDate: new Date(),
-              endDate: { $toDate: "$dt_encerramento_campanha" },
-              unit: "year"
-            }
-          }
-        }
-      },
-      {
-        $group: {
-          _id: "$_id",
-          usuario_id: { $first: "$usuario_id" },
-          nm_titulo_campanha: { $first: "$nm_titulo_campanha" },
-          dt_encerramento_campanha: { $first: "$dt_encerramento_campanha" },
-          minutos_restantes: { $first: "$minutos_restantes" },
-          horas_restantes: { $first: "$horas_restantes" },
-          dias_restantes: { $first: "$dias_restantes" },
-          meses_restantes: { $first: "$meses_restantes" },
-          anos_restantes: { $first: "$anos_restantes" },
-          nm_cidade_campanha: { $first: "$nm_cidade_campanha" },
-          sg_estado_campanha: { $first: "$sg_estado_campanha" },
-          qt_total_campanha: { $sum: "$alimentosCampanha.qt_alimento_meta" },
-          qt_doacoes_campanha: { $sum: "$doacoesAgregadas.qt_alimento_doado" },
-          ds_acao_campanha: { $first: "$ds_acao_campanha" },
-          cd_imagem_campanha: { $first: "$cd_imagem_campanha" },
-          nm_usuario: { $first: "$usuario.nm_usuario" },
-          cd_foto_usuario: { $first: "$usuario.cd_foto_usuario" },
-          alimentos: {
-            $push: {
-              nm_alimento: "$detalhesAlimentos.nm_alimento",
-              alimento_id: "$detalhesAlimentos._id",
-              sg_medida_alimento: "$detalhesAlimentos.sg_medida_alimento",
-              qt_alimento_meta: "$alimentosCampanha.qt_alimento_meta",  // Incluindo qt_alimento_meta
-              qt_alimento_doado: { $ifNull: [{ $sum: "$doacoesAgregadas.qt_alimento_doado" }, 0] }
-            }
-          }
-        }
-      }
-    ]).toArray();
-
-    if (campanhas.length === 0) {
+    });
+    
+    const campanhasAgregadas = campanhas.map((campanha: any) => {
+      const now = new Date();
+      const dtEncerramento = campanha.dt_encerramento_campanha;
+    
+      const minutosRestantes = Math.floor((dtEncerramento.getTime() - now.getTime()) / (1000 * 60));
+      const horasRestantes = Math.floor((dtEncerramento.getTime() - now.getTime()) / (1000 * 60 * 60));
+      const diasRestantes = Math.floor((dtEncerramento.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+      const mesesRestantes = Math.floor((dtEncerramento.getTime() - now.getTime()) / (1000 * 60 * 60 * 24 * 30));
+      const anosRestantes = Math.floor((dtEncerramento.getTime() - now.getTime()) / (1000 * 60 * 60 * 24 * 365));
+    
+      const qt_total_campanha = campanha.alimentosCampanha.reduce(
+        (total: any, alimento: any) => total + alimento.qt_alimento_meta,
+        0
+      );
+    
+      const qt_doacoes_campanha = campanha.alimentosCampanha.reduce(
+        (total: any, alimento: any) =>
+          total + (alimento.doacoes.length > 0 ? alimento.doacoes[0].qt_alimento_doado : 0),
+        0
+      );
+    
+      return {
+        ...campanha,
+        minutos_restantes: minutosRestantes,
+        horas_restantes: horasRestantes,
+        dias_restantes: diasRestantes,
+        meses_restantes: mesesRestantes,
+        anos_restantes: anosRestantes,
+        qt_total_campanha: qt_total_campanha,
+        qt_doacoes_campanha: qt_doacoes_campanha,
+        alimentos: campanha.alimentosCampanha.map((alimento: any) => ({
+          nm_alimento: alimento.alimento.nm_alimento,
+          alimento_id: alimento.alimento.id,
+          sg_medida_alimento: alimento.alimento.sg_medida_alimento,
+          qt_alimento_meta: alimento.qt_alimento_meta,
+          qt_alimento_doado: alimento.doacoes.length > 0 ? alimento.doacoes[0].qt_alimento_doado : 0,
+        })),
+      };
+    });
+    
+    if (campanhasAgregadas.length === 0) {
       throw new Error('Campanha não encontrada');
     }
-
-    return campanhas[0]; // Retorna a primeira campanha encontrada
+    
+    return campanhasAgregadas[0];
+    
 
 
   } else {
-    const campanhas = await db.collection('campanha').aggregate([
-      // Etapa 1: Filtrar campanhas ainda ativas
-      {
-        $match: {
-          dt_encerramento_campanha: { $gt: new Date() } // Data de encerramento maior que a atual
-        }
+    const campanhas = await prisma.campanha.findMany({
+      where: {
+        dt_encerramento_campanha: {
+          gt: new Date(), // Filtra campanhas ativas
+        },
       },
-      
-      // Etapa 2: Realizar o lookup para unir com a coleção de usuários
-      {
-        $lookup: {
-          from: 'usuario',
-          localField: 'usuario_id',
-          foreignField: '_id',
-          as: 'usuario'
-        }
-      },
-      
-      // Etapa 3: Desestruturar o array de usuários (já que é um left join)
-      { $unwind: { path: "$usuario", preserveNullAndEmptyArrays: true } },
-      
-      // Etapa 4: Filtrar usuários que não foram deletados
-      // {
-      //   $match: {
-      //     "usuario.fg_usuario_deletado": 0
-      //   }
-      // },
-    
-      // Etapa 5: Lookup para unir com alimento_campanha
-      {
-        $lookup: {
-          from: 'alimento_campanha',
-          localField: '_id',
-          foreignField: 'campanha_id',
-          as: 'alimentosCampanha'
-        }
-      },
-
-      { $unwind: { path: "$alimentosCampanha", preserveNullAndEmptyArrays: true } },
-    
-      // Etapa 6: Lookup para unir com alimento_doacao
-      {
-        $lookup: {
-          from: 'alimento_doacao',
-          localField: '_id',
-          foreignField: 'campanha_id',
-          as: 'doacoes'
-        }
-      },
-    
-      // Etapa 7: Lookup para unir com alimento (detalhes dos alimentos)
-      {
-        $lookup: {
-          from: 'alimento',
-          localField: 'alimentosCampanha.alimento_id',
-          foreignField: '_id',
-          as: 'detalhesAlimentos'
-        }
-      },
-    
-      { $unwind: { path: "$doacoes", preserveNullAndEmptyArrays: true } },
-      { $unwind: { path: "$detalhesAlimentos", preserveNullAndEmptyArrays: true } },
-
-
-
-      // Etapa 8: Calcular os campos de tempo restantes
-      {
-        $addFields: {
-          minutos_restantes: {
-            $dateDiff: {
-              startDate: new Date(),
-              endDate: { $toDate: "$dt_encerramento_campanha" },
-              unit: "minute"
-            }
+      include: {
+        usuario: true, // Faz o "join" com a tabela de usuários
+        alimentosCampanha: {
+          include: {
+            detalhesAlimentos: true, // Faz o "join" com a tabela de alimentos
           },
-          horas_restantes: {
-            $dateDiff: {
-              startDate: new Date(),
-              endDate: { $toDate: "$dt_encerramento_campanha" },
-              unit: "hour"
-            }
-          },
-          dias_restantes: {
-            $dateDiff: {
-              startDate: new Date(),
-              endDate: { $toDate: "$dt_encerramento_campanha" },
-              unit: "day"
-            }
-          },
-          meses_restantes: {
-            $dateDiff: {
-              startDate: new Date(),
-              endDate: { $toDate: "$dt_encerramento_campanha" },
-              unit: "month"
-            }
-          },
-          anos_restantes: {
-            $dateDiff: {
-              startDate: new Date(),
-              endDate: { $toDate: "$dt_encerramento_campanha" },
-              unit: "year"
-            }
-          }
-        }
+        },
+        doacoes: true, // Faz o "join" com a tabela de doações
       },
-    
-      // Etapa 9: Agrupar por campanha e somar as quantidades de alimentos
-      {
-        $group: {
-          _id: "$_id",
-          usuario_id: { $first: "$usuario_id" },
-          nm_titulo_campanha: { $first: "$nm_titulo_campanha" },
-          dt_encerramento_campanha: { $first: "$dt_encerramento_campanha" },
-          minutos_restantes: { $first: "$minutos_restantes" },
-          horas_restantes: { $first: "$horas_restantes" },
-          dias_restantes: { $first: "$dias_restantes" },
-          meses_restantes: { $first: "$meses_restantes" },
-          anos_restantes: { $first: "$anos_restantes" },
-          nm_cidade_campanha: { $first: "$nm_cidade_campanha" },
-          sg_estado_campanha: { $first: "$sg_estado_campanha" },
-          qt_total_campanha: { $sum: "$alimentosCampanha.qt_alimento_meta" },
-          qt_doacoes_campanha: { $sum: "$doacoes.qt_alimento_doado" },
-          ds_acao_campanha: { $first: "$ds_acao_campanha" },
-          cd_imagem_campanha: { $first: "$cd_imagem_campanha" },
-          nm_usuario: { $first: "$usuario.nm_usuario" },
-          cd_foto_usuario: { $first: "$usuario.cd_foto_usuario" },
-          alimentos: {
-            $push: {
-              nm_alimento: "$detalhesAlimentos.nm_alimento",
-              alimento_id: "$detalhesAlimentos._id",
-              sg_medida_alimento: "$detalhesAlimentos.sg_medida_alimento",
-              qt_alimento_meta: "$alimentosCampanha.qt_alimento_meta",  // Incluindo qt_alimento_meta
-              qt_alimento_doado: { $ifNull: [{ $sum: "$doacoes.qt_alimento_doado" }, 0] }
-            }
-          }
-        }
+      orderBy: {
+        dt_encerramento_campanha: 'desc', // Ordena pela data de encerramento
       },
+    });
     
-      // Etapa 10: Ordenar por data de criação da campanha
-      {
-        $sort: {
-          dt_encerramento_campanha: -1
-        }
-      }
-    ]).toArray();
-
-    return campanhas;
+    // Agora vamos adicionar os campos calculados manualmente
+    const campanhasComCamposCalculados = campanhas.map((campanha: any) => {
+      const now = new Date();
+      const dtEncerramento = new Date(campanha.dt_encerramento_campanha);
+    
+      // Calcula o tempo restante em diferentes unidades
+      const minutosRestantes = Math.floor((dtEncerramento.getTime() - now.getTime()) / (1000 * 60));
+      const horasRestantes = Math.floor((dtEncerramento.getTime() - now.getTime()) / (1000 * 60 * 60));
+      const diasRestantes = Math.floor((dtEncerramento.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+      const mesesRestantes = (dtEncerramento.getFullYear() - now.getFullYear()) * 12 + (dtEncerramento.getMonth() - now.getMonth());
+      const anosRestantes = dtEncerramento.getFullYear() - now.getFullYear();
+    
+      return {
+        ...campanha,
+        minutos_restantes: minutosRestantes,
+        horas_restantes: horasRestantes,
+        dias_restantes: diasRestantes,
+        meses_restantes: mesesRestantes,
+        anos_restantes: anosRestantes,
+        // Calcula o total de alimentos e doações
+        qt_total_campanha: campanha.alimentosCampanha.reduce((sum: any, alimento: any) => sum + alimento.qt_alimento_meta, 0),
+        qt_doacoes_campanha: campanha.doacoes.reduce((sum: any, doacao: any) => sum + doacao.qt_alimento_doado, 0),
+        // Mapeia os alimentos e suas doações
+        alimentos: campanha.alimentosCampanha.map((alimento: any) => ({
+          nm_alimento: alimento.detalhesAlimentos.nm_alimento,
+          alimento_id: alimento.detalhesAlimentos.id,
+          sg_medida_alimento: alimento.detalhesAlimentos.sg_medida_alimento,
+          qt_alimento_meta: alimento.qt_alimento_meta,
+          qt_alimento_doado: campanha.doacoes
+            .filter((doacao: any) => doacao.campanha_id === campanha.id)
+            .reduce((sum: any, doacao: any) => sum + doacao.qt_alimento_doado, 0), // Soma as doações relacionadas
+        })),
+      };
+    });
+    
+    return campanhasComCamposCalculados;
+    
   }
 };
 
 // Função para buscar todos os alimentos doados
 const alimentosDoados = async () => {
-    const query = await db.collection('alimento_doacao').find().toArray();
+    const query = await prisma.alimento_doacao.findMany();
     return query;
 };
 
 // Função para buscar todos os alimentos agrupados por tipo
 const alimentos = async () => {
-  const query = await db.collection('alimento').aggregate([
-    {
-      $group: {
-        _id: { cd_tipo_alimento: "$cd_tipo_alimento", nm_tipo_alimento: "$nm_tipo_alimento" }, // Agrupa pelo tipo de alimento
-        alimentos: {
-          $push: {
-            nm_alimento: "$nm_alimento",
-            sg_medida_alimento: "$sg_medida_alimento",
-            _id: "$_id",
-          },
-        },
-      },
+  const query = await prisma.alimento.findMany({
+    select: {
+      cd_tipo_alimento: true,
+      nm_tipo_alimento: true,
+      nm_alimento: true,
+      sg_medida_alimento: true,
+      id: true,
     },
-    { $sort: { "_id.cd_tipo_alimento": 1 } }, // Ordena pelo tipo de alimento
-  ]).toArray();
-
-  // Reestrutura os dados para retirar o campo _id e deixar o resultado mais próximo ao SQL
-  const result = query.map(item => ({
-    cd_tipo_alimento: item._id.cd_tipo_alimento,
-    nm_tipo_alimento: item._id.nm_tipo_alimento,
-    alimentos: item.alimentos,
-  }));
-
-  return result;
+    orderBy: {
+      cd_tipo_alimento: 'asc', // Ordena pelo tipo de alimento
+    },
+  });
+  
+  // Agrupa os alimentos pelo tipo
+  const groupedResult = query.reduce((acc: any, item: any) => {
+    const tipoAlimentoKey = item.cd_tipo_alimento;
+    const tipoAlimentoNome = item.nm_tipo_alimento;
+  
+    if (!acc[tipoAlimentoKey]) {
+      acc[tipoAlimentoKey] = {
+        cd_tipo_alimento: tipoAlimentoKey,
+        nm_tipo_alimento: tipoAlimentoNome,
+        alimentos: [],
+      };
+    }
+  
+    acc[tipoAlimentoKey].alimentos.push({
+      nm_alimento: item.nm_alimento,
+      sg_medida_alimento: item.sg_medida_alimento,
+      id: item.id,
+    });
+  
+    return acc;
+  }, {});
+  
+  // Converte o resultado em um array
+  const result = Object.values(groupedResult);
+  
+  return result;  
 };
 
 
@@ -377,7 +249,7 @@ const insertAlimentosCampanha = async (cdCampanha: string, alimentos: IAlimentoI
         qt_alimento_meta: alimento.qt_alimento_meta,
     }));
 
-    const result = await db.collection('alimento_campanha').insertMany(alimentosCampanha);
+    const result = await prisma.alimento_campanha.insertMany(alimentosCampanha);
     return result;
 };
 
@@ -389,25 +261,39 @@ const insertAlimentosDoacao = async (cdCampanha: string, cdUsuario: string, alim
       qt_alimento_doado: alimento.qt_alimento_doacao,
     }));
   
-    const result = await db.collection('alimento_doacao').insertMany(alimentosDoacao);
+    const result = await prisma.alimento_doacao.insertMany(alimentosDoacao);
     return result;
   };
   
   const insertUsuario = async (userInfos: any) => {
     const campoDocumento = userInfos.tipo_usuario === 'pf' ? 'ch_cpf_usuario' : 'ch_cnpj_usuario';
+    let usuario = {}
+    if(userInfos.tipo_usuario === "pf"){
+      usuario = {
+        nm_usuario: userInfos.nm_usuario,
+        ch_cpf_usuario: userInfos.ch_documento_usuario,
+        dt_nascimento_usuario: userInfos.dt_nascimento_usuario,
+        nr_celular_usuario: userInfos.nr_celular_usuario,
+        sg_estado_usuario: userInfos.sg_estado_usuario,
+        nm_cidade_usuario: userInfos.nm_cidade_usuario,
+        cd_senha_usuario: userInfos.cd_senha_usuario,
+        cd_email_usuario: userInfos.cd_email_usuario,
+      };
+    } else {
+      usuario = {
+        nm_usuario: userInfos.nm_usuario,
+        ch_cnpj_usuario: userInfos.ch_documento_usuario,
+        dt_nascimento_usuario: userInfos.dt_nascimento_usuario,
+        nr_celular_usuario: userInfos.nr_celular_usuario,
+        sg_estado_usuario: userInfos.sg_estado_usuario,
+        nm_cidade_usuario: userInfos.nm_cidade_usuario,
+        cd_senha_usuario: userInfos.cd_senha_usuario,
+        cd_email_usuario: userInfos.cd_email_usuario,
+      };
+    }
+    
   
-    const usuario = {
-      nm_usuario: userInfos.nm_usuario,
-      [campoDocumento]: userInfos.ch_documento_usuario,
-      dt_nascimento_usuario: userInfos.dt_nascimento_usuario,
-      nr_celular_usuario: userInfos.nr_celular_usuario,
-      sg_estado_usuario: userInfos.sg_estado_usuario,
-      nm_cidade_usuario: userInfos.nm_cidade_usuario,
-      cd_senha_usuario: userInfos.cd_senha_usuario,
-      cd_email_usuario: userInfos.cd_email_usuario,
-    };
-  
-    const result = await db.collection('usuario').insertOne(usuario);
+    const result = await prisma.usuario.insertOne(usuario);
     return result;
   };
   
@@ -419,7 +305,7 @@ const insertAlimentosDoacao = async (cdCampanha: string, cdUsuario: string, alim
     }
 
     try {
-        const user = await db.collection('usuario').findOne(query);
+        const user = await prisma.usuario.findOne(query);
         return user;  // Retorna o usuário encontrado, ou null se não encontrado
     } catch (error) {
         console.error('Erro ao validar login:', error);
@@ -471,7 +357,7 @@ const insertAlimentosDoacao = async (cdCampanha: string, cdUsuario: string, alim
     };
   
     try {
-      const campanhaInserida = await db.collection('campanha').insertOne(campanhaData);
+      const campanhaInserida = await prisma.campanha.insertOne(campanhaData);
       const campanhaId = campanhaInserida.insertedId;
       let alimentosToInsert;
       let alimentosResponse;
@@ -488,7 +374,7 @@ const insertAlimentosDoacao = async (cdCampanha: string, cdUsuario: string, alim
           campanha_id: campanhaId,
           qt_alimento_meta: alimento.qt_alimento_meta,
         };
-        alimentosResponse = await db.collection('alimento_campanha').insertOne(alimentosToInsert);
+        alimentosResponse = await prisma.alimento_campanha.insertOne(alimentosToInsert);
         inserted = 1;
       } else {
         alimentosToInsert = alimentosArray.map((alimento: { _id: any; qt_alimento_meta: any }) => ({
@@ -496,7 +382,7 @@ const insertAlimentosDoacao = async (cdCampanha: string, cdUsuario: string, alim
           campanha_id: campanhaId,
           qt_alimento_meta: alimento.qt_alimento_meta,
         }));
-        alimentosResponse = await db.collection('alimento_campanha').insertMany(alimentosToInsert);
+        alimentosResponse = await prisma.alimento_campanha.insertMany(alimentosToInsert);
         inserted = alimentosResponse.insertedCount;
       }
   
@@ -520,7 +406,7 @@ const insertAlimentosDoacao = async (cdCampanha: string, cdUsuario: string, alim
         qt_alimento_doado: alimento.qt_alimento_doacao,
       }));
   
-      const response = await db.collection('alimento_doacao').insertMany(alimentosToInsert);
+      const response = await prisma.alimento_doacao.insertMany(alimentosToInsert);
 
       for (const alimento of alimentos_doacao) {
         if (!alimento || !alimento.alimento_id) {
@@ -534,7 +420,7 @@ const insertAlimentosDoacao = async (cdCampanha: string, cdUsuario: string, alim
         }
       
         try {
-          await db.collection('campanha').updateOne(
+          await prisma.campanha.updateOne(
             { _id: new ObjectId(cd_campanha_doacao), "alimentos.alimento_id": new ObjectId(alimento.alimento_id) },
             {
               $inc: {
@@ -562,7 +448,7 @@ const insertAlimentosDoacao = async (cdCampanha: string, cdUsuario: string, alim
       const hashedPassword = await bcrypt.hash(userInfos.cd_senha_usuario, salt);
       userInfos.cd_senha_usuario = hashedPassword;
       console.log("user: ", userInfos);
-      const userResponse = await db.collection('usuario').insertOne(userInfos);
+      const userResponse = await prisma.usuario.insertOne(userInfos);
       
       // Como não existe mais o 'ops', utilize o insertedId
       res.json({ _id: userResponse.insertedId, ...userInfos });
@@ -577,7 +463,7 @@ const insertAlimentosDoacao = async (cdCampanha: string, cdUsuario: string, alim
     const { user_email, user_password } = req.body;
   
     try {
-      const userResponse = await db.collection('usuario').findOne({ cd_email_usuario: user_email });
+      const userResponse = await prisma.usuario.findOne({ cd_email_usuario: user_email });
   
       if (!userResponse) {
         return res.status(400).json({

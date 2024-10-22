@@ -38,6 +38,7 @@ model alimento_campanha {
 model usuario {
 
   id                        String     @id @default(auto()) @map("_id") @db.ObjectId
+  tipo_usuario              String
   nm_usuario                String
   ch_cpf_usuario            String?    @unique
   ch_cnpj_usuario           String?    @unique
