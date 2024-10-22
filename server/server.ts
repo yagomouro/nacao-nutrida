@@ -71,12 +71,10 @@ const campanhas = async (id: string | null = null) => {
       // Etapa 1: Filtrar campanhas não deletadas e ainda ativas, além de verificar o ID da campanha
       {
         $match: {
-          dt_encerramento_campanha: { $gt: new Date() }, // Data de encerramento maior que a atual
-          _id: new ObjectId(id) // Filtrar pelo ID da campanha
+          dt_encerramento_campanha: { $gt: new Date() },
+          _id: new ObjectId(id)
         }
       },
-    
-      // Etapa 2: Realizar o lookup para unir com a coleção de usuários
       {
         $lookup: {
           from: 'usuario',
@@ -85,18 +83,12 @@ const campanhas = async (id: string | null = null) => {
           as: 'usuario'
         }
       },
-    
-      // Etapa 3: Desestruturar o array de usuários (equivalente ao LEFT JOIN)
       { $unwind: { path: "$usuario", preserveNullAndEmptyArrays: true } },
-    
-      // Etapa 4: Filtrar usuários que não foram deletados
       {
         $match: {
           "usuario.fg_usuario_deletado": 0
         }
       },
-    
-      // Etapa 5: Lookup para unir com alimento_campanha
       {
         $lookup: {
           from: 'alimento_campanha',
@@ -106,8 +98,6 @@ const campanhas = async (id: string | null = null) => {
         }
       },
       { $unwind: { path: "$alimentosCampanha", preserveNullAndEmptyArrays: true } },
-    
-      // Etapa 6: Lookup para unir com alimento_doacao (subquery de doações agregadas)
       {
         $lookup: {
           from: 'alimento_doacao',
@@ -129,8 +119,6 @@ const campanhas = async (id: string | null = null) => {
         }
       },
       { $unwind: { path: "$doacoesAgregadas", preserveNullAndEmptyArrays: true } },
-    
-      // Etapa 7: Lookup para unir com alimento (detalhes dos alimentos)
       {
         $lookup: {
           from: 'alimento',
@@ -139,11 +127,7 @@ const campanhas = async (id: string | null = null) => {
           as: 'detalhesAlimentos'
         }
       },
-    
-      // Etapa 8: Desestruturar alimentosCampanha e detalhes dos alimentos para facilitar a junção
       { $unwind: { path: "$detalhesAlimentos", preserveNullAndEmptyArrays: true } },
-    
-      // Etapa 9: Calcular os campos de tempo restantes (minutos, horas, dias, meses, anos)
       {
         $addFields: {
           minutos_restantes: {
@@ -183,8 +167,6 @@ const campanhas = async (id: string | null = null) => {
           }
         }
       },
-    
-      // Etapa 10: Agrupar a campanha e calcular os valores totais de alimentos e doações
       {
         $group: {
           _id: "$_id",
@@ -207,9 +189,9 @@ const campanhas = async (id: string | null = null) => {
           alimentos: {
             $push: {
               nm_alimento: "$detalhesAlimentos.nm_alimento",
-              cd_alimento: "$detalhesAlimentos._id",
+              alimento_id: "$detalhesAlimentos._id",
               sg_medida_alimento: "$detalhesAlimentos.sg_medida_alimento",
-              qt_alimento_meta: "$alimentosCampanha.qt_alimento_meta",
+              qt_alimento_meta: "$alimentosCampanha.qt_alimento_meta",  // Incluindo qt_alimento_meta
               qt_alimento_doado: { $ifNull: [{ $sum: "$doacoesAgregadas.qt_alimento_doado" }, 0] }
             }
           }
@@ -354,7 +336,10 @@ const campanhas = async (id: string | null = null) => {
           alimentos: {
             $push: {
               nm_alimento: "$detalhesAlimentos.nm_alimento",
-              sg_medida_alimento: "$detalhesAlimentos.sg_medida_alimento"
+              alimento_id: "$detalhesAlimentos._id",
+              sg_medida_alimento: "$detalhesAlimentos.sg_medida_alimento",
+              qt_alimento_meta: "$alimentosCampanha.qt_alimento_meta",  // Incluindo qt_alimento_meta
+              qt_alimento_doado: { $ifNull: [{ $sum: "$doacoes.qt_alimento_doado" }, 0] }
             }
           }
         }
@@ -551,14 +536,41 @@ const insertAlimentosDoacao = async (cdCampanha: string, cdUsuario: string, alim
     const { cd_usuario_doacao, cd_campanha_doacao } = infos_doacao;
   
     try {
-      const alimentosToInsert = alimentos_doacao.map((alimento: { _id: any; qt_alimento_doado: any }) => ({
-        usuario_id: cd_usuario_doacao,
-        alimento_id: alimento._id,
-        campanha_id: cd_campanha_doacao,
-        qt_alimento_doado: alimento.qt_alimento_doado,
+      const alimentosToInsert = alimentos_doacao.map((alimento: any) => ({
+        usuario_id: infos_doacao.usuario_id,
+        alimento_id: new ObjectId(alimento.alimento_id),
+        campanha_id: new ObjectId(cd_campanha_doacao),
+        qt_alimento_doado: alimento.qt_alimento_doacao,
       }));
   
       const response = await db.collection('alimento_doacao').insertMany(alimentosToInsert);
+
+      for (const alimento of alimentos_doacao) {
+        if (!alimento || !alimento.alimento_id) {
+          console.error(`Alimento inválido: ${JSON.stringify(alimento)}`);
+          continue; // Ignora alimentos inválidos
+        }
+      
+        if (typeof alimento.qt_alimento_doacao !== 'number' || isNaN(alimento.qt_alimento_doacao)) {
+          console.error(`Quantidade inválida de alimento ${alimento._id}: ${alimento.qt_alimento_doado}`);
+          continue; // Ignora doações com quantidade inválida
+        }
+      
+        try {
+          await db.collection('campanha').updateOne(
+            { _id: new ObjectId(cd_campanha_doacao), "alimentos.alimento_id": new ObjectId(alimento.alimento_id) },
+            {
+              $inc: {
+                "alimentos.$.qt_alimento_doado": alimento.qt_alimento_doacao,
+                qt_doacoes_campanha: alimento.qt_alimento_doacao
+              }
+            }
+          );
+        } catch (error) {
+          console.error(`Erro ao atualizar a campanha para o alimento ${alimento._id}:`, error);
+        }
+      }
+
       res.json({ insertedCount: response.insertedCount });
     } catch (error) {
       console.error('Error while processing doacoes:', error);

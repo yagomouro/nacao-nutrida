@@ -12,19 +12,24 @@ import { UserContext } from '../../contexts/userContext';
 
 export const Campanha = () => {
   const navigate = useNavigate()
-  const [campanha, setCampanha] = useState<ICampanhaAlimento[]>([])
+  const [campanha, setCampanha] = useState<ICampanhaAlimento | null>(null);
   const user = useContext(UserContext)
 
   const { _id } = useParams();
-  const url = `/api/campanhas?id=${_id}`;
+  const url = `/api/campanhas/${_id}`;
 
   useEffect(() => {
-    axios.get<ICampanhaAlimento[]>(url).then((response) => {
-      setCampanha(response.data)
+    if(_id){
+    axios.get<ICampanhaAlimento>(url).then((response) => {
+
+      let campanhaData = response.data;
+      campanhaData.alimentos = Array.isArray(campanhaData.alimentos) ? campanhaData.alimentos : [campanhaData.alimentos];
+
+      setCampanha(campanhaData)
     }).catch((err) => {
       console.log('Error: ' + err)
     })
-  }, [_id])
+  }}, [_id])
 
   const [modalVisible, setModalVisible] = useState(false);
 
@@ -74,21 +79,19 @@ export const Campanha = () => {
 
     console.log(infos_doacao)
 
-    let lengthAlimentos = campanha[0].alimentos.length
+    let lengthAlimentos = campanha?.alimentos?.length || 0;
 
-    let alimentos_doacao = Array.from({ length: lengthAlimentos }, (_, index) => {
-      const alimento_id = event.target._id[index].value;
-      const qt_alimento_doacao = parseInt(event.target.qt_alimento_doacao[index].value);
+    let alimentos_doacao = Array.isArray(campanha?.alimentos) 
+      ? Array.from({ length: lengthAlimentos }, (_, index) => {
+        const alimento_id = event.target._id[index]?.value || event.target._id.value;
+        const qt_alimento_doacao = parseInt(event.target.qt_alimento_doacao[index]?.value || event.target.qt_alimento_doacao.value);
 
       if (qt_alimento_doacao > 0) {
-        return {
-          alimento_id,
-          qt_alimento_doacao
-        };
-      } else {
-        return null;
+        return { alimento_id, qt_alimento_doacao };
       }
-    }).filter(item => item !== null);
+      return null;
+      }).filter(item => item !== null)
+      : [];
 
     console.log(alimentos_doacao)
 
@@ -124,7 +127,7 @@ export const Campanha = () => {
 
 
   return (
-    campanha && campanha[0] && campanha[0].alimentos &&
+    campanha && campanha && campanha.alimentos &&
     <>
       <Navbar />
 
@@ -141,7 +144,7 @@ export const Campanha = () => {
                 <label>Quantidade</label>
               </div>
               <div className="qtdAlimentos">
-                {campanha[0].alimentos.map((alimento, index) => (
+                {campanha.alimentos.map((alimento, index) => (
                   <div key={index} className="row">
                     <div className="alimento-campanha">
                       <input
@@ -155,7 +158,7 @@ export const Campanha = () => {
                     <div className="alimento-quantidade">
                       <div className="qtdAl">
                         <input className="input-form" type="number" name={`qt_alimento_doacao`} min="0" />
-                        <input type="hidden" name={`_id`} value={alimento._id} />
+                        <input type="hidden" name={`_id`} value={alimento.alimento_id} />
                         <h1 className="sub titulo">{alimento.sg_medida_alimento}</h1>
                       </div>
                     </div>
@@ -175,16 +178,16 @@ export const Campanha = () => {
 
       <main className="pg_campanha">
         <div className="container-campanha column">
-          <div key={campanha[0].nm_titulo_campanha}>
-            <h1 className="titulo black">{campanha[0].nm_titulo_campanha}</h1>
+          <div key={campanha.nm_titulo_campanha}>
+            <h1 className="titulo black">{campanha.nm_titulo_campanha}</h1>
             <div className="subcontainer-campanha row">
               <div className="container-descricao">
                 <div className="container-img">
-                  <img src={`/assets/campanhas/${campanha[0].cd_imagem_campanha}`} alt="" />
+                  <img src={`/assets/campanhas/${campanha.cd_imagem_campanha}`} alt="" />
                 </div>
                 <div className="descricao">
                   <h1 className="sub titulo black">Descrição</h1>
-                  <p>{campanha[0].ds_acao_campanha}</p>
+                  <p>{campanha.ds_acao_campanha}</p>
                   <div className="denunciar">
                     <Link className="row" to={`#`}>
                       <img src="/assets/img/icone_denounce_black.svg" alt="Denunciar" />
@@ -197,28 +200,28 @@ export const Campanha = () => {
                 <header className="header-alimentos row">
                   <div className="usuario row">
                     <div className="img-wrapper">
-                      <img src={`/assets/profile/${campanha[0].cd_foto_usuario}`} alt="Foto do usuário" />
+                      <img src={`/assets/profile/${campanha.cd_foto_usuario}`} alt="Foto do usuário" />
                     </div>
                     <div>
-                      <h2>{campanha[0].nm_usuario}</h2>
-                      <p className="titulo-gray cidadeEstado">{`${campanha[0].nm_cidade_campanha}, ${campanha[0].sg_estado_campanha}`}</p>
+                      <h2>{campanha.nm_usuario}</h2>
+                      <p className="titulo-gray cidadeEstado">{`${campanha.nm_cidade_campanha}, ${campanha.sg_estado_campanha}`}</p>
                     </div>
                   </div>
                   <div className="header-campanha">
                     <div>
                       <img src="/assets/img/icone_pin.svg" alt="Icone pin" />
-                      <p className="cidadeEstado">{`${campanha[0].nm_cidade_campanha}, ${campanha[0].sg_estado_campanha}`}</p>
+                      <p className="cidadeEstado">{`${campanha.nm_cidade_campanha}, ${campanha.sg_estado_campanha}`}</p>
                     </div>
                     <div>
                       <img src="/assets/img/icone_relogio.svg" alt="Icone relógio" />
-                      <p>{contarTempoRestante(campanha[0].anos_restantes, campanha[0].meses_restantes, campanha[0].dias_restantes, campanha[0].horas_restantes, campanha[0].minutos_restantes)}</p>
+                      <p>{contarTempoRestante(campanha.anos_restantes, campanha.meses_restantes, campanha.dias_restantes, campanha.horas_restantes, campanha.minutos_restantes)}</p>
                     </div>
                   </div>
                 </header>
                 <div className="main-alimentos column">
                   <h2 className="titulo black">Alimentos:</h2>
                   <div className="alimento-container column">
-                    {campanha[0].alimentos.map((alimento) => (
+                    {campanha.alimentos.map((alimento) => (
                       <div key={alimento.nm_alimento} className="alimento column">
                         <h2 className="sub titulo">{alimento.nm_alimento}</h2>
                         <div className="progresso-container row">
