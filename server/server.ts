@@ -19,18 +19,6 @@ interface IAlimentoDoacao {
     qt_alimento_doacao: number;
 }
 
-interface IUsuarioInsert {
-    _id: string,
-    nm_usuario: String,
-    ch_documento_usuario: String,
-    dt_nascimento_usuario: String,
-    nr_celular_usuario: String,
-    sg_estado_usuario: String,
-    nm_cidade_usuario: String,
-    cd_senha_usuario: String,
-    cd_email_usuario: String,
-}
-
 const salt = bcrypt.genSaltSync(12);
 
 // Função para buscar todos os usuários
@@ -249,7 +237,9 @@ const insertAlimentosCampanha = async (cdCampanha: string, alimentos: IAlimentoI
         qt_alimento_meta: alimento.qt_alimento_meta,
     }));
 
-    const result = await prisma.alimento_campanha.insertMany(alimentosCampanha);
+    const result = await prisma.alimento_campanha.create({
+      data: alimentosCampanha
+    });
     return result;
 };
 
@@ -261,18 +251,19 @@ const insertAlimentosDoacao = async (cdCampanha: string, cdUsuario: string, alim
       qt_alimento_doado: alimento.qt_alimento_doacao,
     }));
   
-    const result = await prisma.alimento_doacao.insertMany(alimentosDoacao);
+    const result = await prisma.alimento_doacao.create({
+      data: alimentosDoacao
+    });
     return result;
   };
   
   const insertUsuario = async (userInfos: any) => {
-    const campoDocumento = userInfos.tipo_usuario === 'pf' ? 'ch_cpf_usuario' : 'ch_cnpj_usuario';
     let usuario = {}
     if(userInfos.tipo_usuario === "pf"){
       usuario = {
         nm_usuario: userInfos.nm_usuario,
         ch_cpf_usuario: userInfos.ch_documento_usuario,
-        dt_nascimento_usuario: userInfos.dt_nascimento_usuario,
+        dt_nascimento_usuario: new Date(userInfos.dt_nascimento_usuario).toISOString(),
         nr_celular_usuario: userInfos.nr_celular_usuario,
         sg_estado_usuario: userInfos.sg_estado_usuario,
         nm_cidade_usuario: userInfos.nm_cidade_usuario,
@@ -283,7 +274,7 @@ const insertAlimentosDoacao = async (cdCampanha: string, cdUsuario: string, alim
       usuario = {
         nm_usuario: userInfos.nm_usuario,
         ch_cnpj_usuario: userInfos.ch_documento_usuario,
-        dt_nascimento_usuario: userInfos.dt_nascimento_usuario,
+        dt_nascimento_usuario: new Date(userInfos.dt_nascimento_usuario).toISOString(),
         nr_celular_usuario: userInfos.nr_celular_usuario,
         sg_estado_usuario: userInfos.sg_estado_usuario,
         nm_cidade_usuario: userInfos.nm_cidade_usuario,
@@ -291,9 +282,10 @@ const insertAlimentosDoacao = async (cdCampanha: string, cdUsuario: string, alim
         cd_email_usuario: userInfos.cd_email_usuario,
       };
     }
-    
   
-    const result = await prisma.usuario.insertOne(usuario);
+    const result = await prisma.usuario.create({
+      data: usuario,
+    });
     return result;
   };
   
@@ -305,7 +297,11 @@ const insertAlimentosDoacao = async (cdCampanha: string, cdUsuario: string, alim
     }
 
     try {
-        const user = await prisma.usuario.findOne(query);
+      const user = await prisma.usuario.findFirst({
+        where: {
+          cd_email_usuario: user_email, // ou qualquer outra chave única
+        },
+      });
         return user;  // Retorna o usuário encontrado, ou null se não encontrado
     } catch (error) {
         console.error('Erro ao validar login:', error);
@@ -357,7 +353,9 @@ const insertAlimentosDoacao = async (cdCampanha: string, cdUsuario: string, alim
     };
   
     try {
-      const campanhaInserida = await prisma.campanha.insertOne(campanhaData);
+      const campanhaInserida = await prisma.campanha.create({
+        data: campanhaData
+      });
       const campanhaId = campanhaInserida.insertedId;
       let alimentosToInsert;
       let alimentosResponse;
@@ -374,7 +372,9 @@ const insertAlimentosDoacao = async (cdCampanha: string, cdUsuario: string, alim
           campanha_id: campanhaId,
           qt_alimento_meta: alimento.qt_alimento_meta,
         };
-        alimentosResponse = await prisma.alimento_campanha.insertOne(alimentosToInsert);
+        alimentosResponse = await prisma.alimento_campanha.create({
+          data: alimentosToInsert
+        });
         inserted = 1;
       } else {
         alimentosToInsert = alimentosArray.map((alimento: { _id: any; qt_alimento_meta: any }) => ({
@@ -382,7 +382,9 @@ const insertAlimentosDoacao = async (cdCampanha: string, cdUsuario: string, alim
           campanha_id: campanhaId,
           qt_alimento_meta: alimento.qt_alimento_meta,
         }));
-        alimentosResponse = await prisma.alimento_campanha.insertMany(alimentosToInsert);
+        alimentosResponse = await prisma.alimento_campanha.create({
+          data: alimentosToInsert
+        });
         inserted = alimentosResponse.insertedCount;
       }
   
@@ -406,7 +408,9 @@ const insertAlimentosDoacao = async (cdCampanha: string, cdUsuario: string, alim
         qt_alimento_doado: alimento.qt_alimento_doacao,
       }));
   
-      const response = await prisma.alimento_doacao.insertMany(alimentosToInsert);
+      const response = await prisma.alimento_doacao.create({
+        data: alimentosToInsert
+      });
 
       for (const alimento of alimentos_doacao) {
         if (!alimento || !alimento.alimento_id) {
@@ -448,7 +452,9 @@ const insertAlimentosDoacao = async (cdCampanha: string, cdUsuario: string, alim
       const hashedPassword = await bcrypt.hash(userInfos.cd_senha_usuario, salt);
       userInfos.cd_senha_usuario = hashedPassword;
       console.log("user: ", userInfos);
-      const userResponse = await prisma.usuario.insertOne(userInfos);
+      const userResponse = await prisma.usuario.create({
+        data: userInfos
+      });
       
       // Como não existe mais o 'ops', utilize o insertedId
       res.json({ _id: userResponse.insertedId, ...userInfos });
@@ -463,7 +469,11 @@ const insertAlimentosDoacao = async (cdCampanha: string, cdUsuario: string, alim
     const { user_email, user_password } = req.body;
   
     try {
-      const userResponse = await prisma.usuario.findOne({ cd_email_usuario: user_email });
+      const userResponse = await prisma.usuario.findFirst({ 
+        where: {
+          cd_email_usuario: user_email 
+    },
+  });
   
       if (!userResponse) {
         return res.status(400).json({
