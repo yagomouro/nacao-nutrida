@@ -1,7 +1,6 @@
 import dotenv from 'dotenv';
 dotenv.config({ path: '../.env' });
 import express, { Request, Response } from 'express';
-const { ObjectId } = require('mongodb');
 import { fetchEstadosCidades } from './config/IbgeApi';
 const bcrypt = require('bcrypt');
 const app = express();
@@ -125,56 +124,71 @@ const campanhas = async (id: string | null = null) => {
           gt: new Date(), // Filtra campanhas ativas
         },
       },
-      include: {
-        usuario: true, // Faz o "join" com a tabela de usuários
-        alimentosCampanha: {
-          include: {
-            detalhesAlimentos: true, // Faz o "join" com a tabela de alimentos
-          },
-        },
-        doacoes: true, // Faz o "join" com a tabela de doações
-      },
       orderBy: {
         dt_encerramento_campanha: 'desc', // Ordena pela data de encerramento
       },
     });
     
-    // Agora vamos adicionar os campos calculados manualmente
-    const campanhasComCamposCalculados = campanhas.map((campanha: any) => {
+    // Adiciona campos calculados manualmente
+    const campanhasComCamposCalculados = await Promise.all(campanhas.map(async (campanha) => {
       const now = new Date();
       const dtEncerramento = new Date(campanha.dt_encerramento_campanha);
     
       // Calcula o tempo restante em diferentes unidades
-      const minutosRestantes = Math.floor((dtEncerramento.getTime() - now.getTime()) / (1000 * 60));
-      const horasRestantes = Math.floor((dtEncerramento.getTime() - now.getTime()) / (1000 * 60 * 60));
-      const diasRestantes = Math.floor((dtEncerramento.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-      const mesesRestantes = (dtEncerramento.getFullYear() - now.getFullYear()) * 12 + (dtEncerramento.getMonth() - now.getMonth());
-      const anosRestantes = dtEncerramento.getFullYear() - now.getFullYear();
+      const minutos_restantes = Math.floor((dtEncerramento.getTime() - now.getTime()) / (1000 * 60));
+      const horas_restantes = Math.floor((dtEncerramento.getTime() - now.getTime()) / (1000 * 60 * 60));
+      const dias_restantes = Math.floor((dtEncerramento.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+      const meses_restantes = (dtEncerramento.getFullYear() - now.getFullYear()) * 12 + (dtEncerramento.getMonth() - now.getMonth());
+      const anos_restantes = dtEncerramento.getFullYear() - now.getFullYear();
+    
+      // Busca as doações relacionadas a esta campanha
+      const doacoes = await prisma.alimento_doacao.findMany({
+        where: { campanha_id: campanha.id },
+      });
+    
+      // Busca os alimentos relacionados a esta campanha
+      const alimentosCampanha = await prisma.alimento_campanha.findMany({
+        where: { campanha_id: campanha.id },
+      });
+    
+      // Busca detalhes dos alimentos em uma consulta separada
+      const alimentosIds = alimentosCampanha.map(alimento => alimento.alimento_id); // Supondo que alimento_id exista em alimento_campanha
+      const detalhesAlimentos = await prisma.alimento.findMany({
+        where: { id: { in: alimentosIds } },
+      });
+    
+      // Mapeia os detalhes dos alimentos
+      const alimentosComDetalhes = alimentosCampanha.map((alimentoCampanha:any) => {
+        const detalheAlimento = detalhesAlimentos.find(alimento => alimento.id === alimentoCampanha.alimento_id);
+        
+        return {
+          nm_alimento: detalheAlimento.nm_alimento,
+          alimento_id: detalheAlimento.id,
+          sg_medida_alimento: detalheAlimento.sg_medida_alimento,
+          qt_alimento_meta: alimentoCampanha.qt_alimento_meta,
+          qt_alimento_doado: doacoes
+            .filter(doacao => doacao.campanha_id === campanha.id)
+            .reduce((sum:any, doacao:any) => sum + doacao.qt_alimento_doado, 0), // Soma as doações relacionadas
+        };
+      });
     
       return {
         ...campanha,
-        minutos_restantes: minutosRestantes,
-        horas_restantes: horasRestantes,
-        dias_restantes: diasRestantes,
-        meses_restantes: mesesRestantes,
-        anos_restantes: anosRestantes,
+        minutos_restantes,
+        horas_restantes,
+        dias_restantes,
+        meses_restantes,
+        anos_restantes,
         // Calcula o total de alimentos e doações
-        qt_total_campanha: campanha.alimentosCampanha.reduce((sum: any, alimento: any) => sum + alimento.qt_alimento_meta, 0),
-        qt_doacoes_campanha: campanha.doacoes.reduce((sum: any, doacao: any) => sum + doacao.qt_alimento_doado, 0),
-        // Mapeia os alimentos e suas doações
-        alimentos: campanha.alimentosCampanha.map((alimento: any) => ({
-          nm_alimento: alimento.detalhesAlimentos.nm_alimento,
-          alimento_id: alimento.detalhesAlimentos.id,
-          sg_medida_alimento: alimento.detalhesAlimentos.sg_medida_alimento,
-          qt_alimento_meta: alimento.qt_alimento_meta,
-          qt_alimento_doado: campanha.doacoes
-            .filter((doacao: any) => doacao.campanha_id === campanha.id)
-            .reduce((sum: any, doacao: any) => sum + doacao.qt_alimento_doado, 0), // Soma as doações relacionadas
-        })),
+        qt_total_campanha: alimentosCampanha.reduce((sum:any, alimento:any) => sum + alimento.qt_alimento_meta, 0),
+        qt_doacoes_campanha: doacoes.reduce((sum:any, doacao:any) => sum + doacao.qt_alimento_doado, 0),
+        alimentos: alimentosComDetalhes,
       };
-    });
+    }));
     
     return campanhasComCamposCalculados;
+    
+    
     
   }
 };
@@ -233,7 +247,7 @@ const alimentos = async () => {
 const insertAlimentosCampanha = async (cdCampanha: string, alimentos: IAlimentoInsert[]) => {
     const alimentosCampanha = alimentos.map(alimento => ({
         alimento_id: alimento._id,
-        campanha_id: new ObjectId(cdCampanha),
+        campanha_id: cdCampanha,
         qt_alimento_meta: alimento.qt_alimento_meta,
     }));
 
@@ -343,7 +357,7 @@ const insertAlimentosDoacao = async (cdCampanha: string, cdUsuario: string, alim
   app.post('/api/campanhas', async (req: Request, res: Response) => {
     const { infos_campanha, alimentos_campanha } = req.body;
     const campanhaData = {
-      usuario_id: new ObjectId(infos_campanha.usuario_id),
+      usuario_id: infos_campanha.usuario_id,
       nm_titulo_campanha: infos_campanha.nm_titulo_campanha,
       dt_encerramento_campanha: new Date(infos_campanha.dt_encerramento_campanha),
       nm_cidade_campanha: infos_campanha.nm_cidade_campanha,
@@ -368,7 +382,7 @@ const insertAlimentosDoacao = async (cdCampanha: string, cdUsuario: string, alim
       if (alimentosArray.length === 1) {
         const alimento = alimentosArray[0];
         alimentosToInsert = {
-          alimento_id: new ObjectId(alimento._id),
+          alimento_id: alimento._id,
           campanha_id: campanhaId,
           qt_alimento_meta: alimento.qt_alimento_meta,
         };
@@ -378,7 +392,7 @@ const insertAlimentosDoacao = async (cdCampanha: string, cdUsuario: string, alim
         inserted = 1;
       } else {
         alimentosToInsert = alimentosArray.map((alimento: { _id: any; qt_alimento_meta: any }) => ({
-          alimento_id: new ObjectId(alimento._id),
+          alimento_id: alimento._id,
           campanha_id: campanhaId,
           qt_alimento_meta: alimento.qt_alimento_meta,
         }));
@@ -403,8 +417,8 @@ const insertAlimentosDoacao = async (cdCampanha: string, cdUsuario: string, alim
     try {
       const alimentosToInsert = alimentos_doacao.map((alimento: any) => ({
         usuario_id: infos_doacao.usuario_id,
-        alimento_id: new ObjectId(alimento.alimento_id),
-        campanha_id: new ObjectId(cd_campanha_doacao),
+        alimento_id: alimento.alimento_id,
+        campanha_id: cd_campanha_doacao,
         qt_alimento_doado: alimento.qt_alimento_doacao,
       }));
   
@@ -425,7 +439,7 @@ const insertAlimentosDoacao = async (cdCampanha: string, cdUsuario: string, alim
       
         try {
           await prisma.campanha.updateOne(
-            { _id: new ObjectId(cd_campanha_doacao), "alimentos.alimento_id": new ObjectId(alimento.alimento_id) },
+            { _id: cd_campanha_doacao, "alimentos.alimento_id": alimento.alimento_id },
             {
               $inc: {
                 "alimentos.$.qt_alimento_doado": alimento.qt_alimento_doacao,
