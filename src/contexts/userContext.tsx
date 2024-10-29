@@ -3,7 +3,7 @@ import { createContext, ReactNode, useState } from 'react'
 import { IUsuario, IUsuarioContext } from '../types/IUsuario'
 
 const user: IUsuario = {
-    '_id': '',
+    'id': '',
     'nm_usuario': '',
     'ch_cpf_usuario': '',
     'ch_cnpj_usuario': '',

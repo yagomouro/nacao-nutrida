@@ -15,7 +15,7 @@ export const Login = () => {
     const navigate = useNavigate()
 
     const value: IUsuario = {
-        '_id': '',
+        'id': '',
         'nm_usuario': '',
         'ch_cpf_usuario': '',
         'ch_cnpj_usuario': '',

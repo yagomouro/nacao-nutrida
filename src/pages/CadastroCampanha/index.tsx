@@ -244,7 +244,7 @@ export const CriacaoCampanha = () => {
         }
 
         const infos_campanha = {
-            usuario_id: user.user._id,
+            usuario_id: user.user.id,
             nm_titulo_campanha: event.target.nm_titulo_campanha.value,
             dt_encerramento_campanha: event.target.dt_encerramento_campanha.value,
             nm_cidade_campanha: event.target.nm_cidade_campanha.value,

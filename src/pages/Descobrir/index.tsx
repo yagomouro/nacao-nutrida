@@ -10,6 +10,7 @@ import { IEstadoCidades } from '../../types/IEstadoCidade';
 
 export const Descobrir = () => {
   const [campanhas, setCampanhas] = useState<ICampanhaAlimento[]>([])
+  console.log("campanhas: ", campanhas);
   const [qtAlimentos, setQtAlimentos] = useState<number>(1)
   const [listaEstadosCidades, setListaEstadosCidades] = useState<IEstadoCidades[]>([])
   const [listaCidades, setListaCidades] = useState<string[]>([])
@@ -113,7 +114,7 @@ export const Descobrir = () => {
           <h1 className="titulo black">Campanhas mais recentes</h1>
           <div className="campanhas row">
             {campanhas.map((campanha) => (
-              <Link key={campanha._id} className="campanha-link" to={`/campanhas/${campanha._id.toString()}`}>
+              <Link key={campanha.id} className="campanha-link" to={`/campanhas/${campanha.id}`}>
                 <div className="campanha">
                   <div className="imagem-campanha">
                     <img src={`/assets/campanhas/${campanha.cd_imagem_campanha}`} alt="" />
@@ -138,12 +139,12 @@ export const Descobrir = () => {
                     <div className="progresso-container column">
                       <div className="porcentagem">
                         <div className="progresso-barra">
-                          <div style={{ width: contarProgresso(campanha.qt_doacoes_campanha, campanha.qt_total_campanha) }} className={`progresso-atual progresso-atual-${campanha._id}`}></div>
+                          <div style={{ width: contarProgresso(campanha.qt_doacoes_campanha, campanha.qt_total_campanha) }} className={`progresso-atual progresso-atual-${campanha.id}`}></div>
                         </div>
                       </div>
                       <div className="arrecadado">
                         <p>
-                          <span className={`arrecadado-${campanha._id}`}>{contarProgresso(campanha.qt_doacoes_campanha, campanha.qt_total_campanha)}</span> arrecadado
+                          <span className={`arrecadado-${campanha.id}`}>{contarProgresso(campanha.qt_doacoes_campanha, campanha.qt_total_campanha)}</span> arrecadado
                         </p>
                       </div>
                     </div>

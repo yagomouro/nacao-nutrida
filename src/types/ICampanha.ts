@@ -1,7 +1,7 @@
 import { IAlimentoDoado } from "./IAlimento";
 
 export interface ICampanha {
-    _id: string;
+    id: string;
     usuario_id: string;
     nm_titulo_campanha: string;
     dt_encerramento_campanha: Date;
@@ -27,7 +27,7 @@ export interface ICampanhaAlimento extends ICampanha {
 }
 
 export interface ICampanhaNova {
-    _id: string;
+    id: string;
     usuario_id: string;
     nm_titulo_campanha: string;
     dt_encerramento_campanha: string;

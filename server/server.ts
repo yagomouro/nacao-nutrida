@@ -30,94 +30,112 @@ const usuarios = async () => {
 const campanhas = async (id: string | null = null) => {
   const now = new Date();
 
-  if (id) {
-    const campanhas = await prisma.campanha.findMany({
-      where: {
-        dt_encerramento_campanha: {
-          gt: new Date(), // Filtra campanhas ativas
-        },
-        id: id, // Verifica o ID da campanha
+if (id) {
+  const campanhas = await prisma.campanha.findMany({
+    where: {
+      dt_encerramento_campanha: {
+        gt: now, // Filtra campanhas ativas
       },
-      include: {
-        usuario: {
-          where: {
-            fg_usuario_deletado: 0, // Filtra usuários não deletados
-          },
-          select: {
-            nm_usuario: true,
-            cd_foto_usuario: true,
-          },
-        },
-        alimentosCampanha: {
-          include: {
-            alimento: {
-              select: {
-                nm_alimento: true,
-                sg_medida_alimento: true,
-                id: true,
-              },
-            },
-            doacoes: {
-              select: {
-                alimento_id: true,
-                campanha_id: true,
-                qt_alimento_doado: true,
-              },
-            },
-          },
-        },
+      id: id, // Verifica o ID da campanha
+    },
+  });
+
+  const campanhasAgregadas = await Promise.all(campanhas.map(async (campanha: any) => {
+    // Busca o usuário relacionado
+    const usuario = await prisma.usuario.findUnique({
+      where: { id: campanha.usuario_id },
+      select: {
+        nm_usuario: true,
+        cd_foto_usuario: true,
       },
     });
-    
-    const campanhasAgregadas = campanhas.map((campanha: any) => {
-      const now = new Date();
-      const dtEncerramento = campanha.dt_encerramento_campanha;
-    
-      const minutosRestantes = Math.floor((dtEncerramento.getTime() - now.getTime()) / (1000 * 60));
-      const horasRestantes = Math.floor((dtEncerramento.getTime() - now.getTime()) / (1000 * 60 * 60));
-      const diasRestantes = Math.floor((dtEncerramento.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-      const mesesRestantes = Math.floor((dtEncerramento.getTime() - now.getTime()) / (1000 * 60 * 60 * 24 * 30));
-      const anosRestantes = Math.floor((dtEncerramento.getTime() - now.getTime()) / (1000 * 60 * 60 * 24 * 365));
-    
-      const qt_total_campanha = campanha.alimentosCampanha.reduce(
-        (total: any, alimento: any) => total + alimento.qt_alimento_meta,
-        0
+
+    // Busca os alimentos relacionados à campanha
+    const alimentosCampanha = await prisma.alimento_campanha.findMany({
+      where: { campanha_id: campanha.id },
+    });
+
+    // Busca os IDs dos alimentos para trazer detalhes e doações
+    const alimentosIds = alimentosCampanha.map((alimento: any) => alimento.alimento_id);
+
+    // Busca detalhes dos alimentos
+    const detalhesAlimentos = await prisma.alimento.findMany({
+      where: { id: { in: alimentosIds } },
+      select: {
+        id: true,
+        nm_alimento: true,
+        sg_medida_alimento: true,
+      },
+    });
+
+    // Busca as doações relacionadas aos alimentos na campanha
+    const doacoes = await prisma.alimento_doacao.findMany({
+      where: { campanha_id: campanha.id },
+      select: {
+        alimento_id: true,
+        qt_alimento_doado: true,
+      },
+    });
+
+    // Calcula o tempo restante em diferentes unidades
+    const dtEncerramento = new Date(campanha.dt_encerramento_campanha);
+    const minutosRestantes = Math.floor((dtEncerramento.getTime() - now.getTime()) / (1000 * 60));
+    const horasRestantes = Math.floor((dtEncerramento.getTime() - now.getTime()) / (1000 * 60 * 60));
+    const diasRestantes = Math.floor((dtEncerramento.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+    const mesesRestantes = Math.floor((dtEncerramento.getTime() - now.getTime()) / (1000 * 60 * 60 * 24 * 30));
+    const anosRestantes = Math.floor((dtEncerramento.getTime() - now.getTime()) / (1000 * 60 * 60 * 24 * 365));
+
+    // Calcula a quantidade total de alimentos e de doações
+    const qt_total_campanha = alimentosCampanha.reduce(
+      (total: any, alimento: any) => total + alimento.qt_alimento_meta,
+      0
+    );
+
+    const qt_doacoes_campanha = doacoes.reduce(
+      (total: any, doacao: any) => total + doacao.qt_alimento_doado,
+      0
+    );
+
+    // Mapeia os detalhes dos alimentos com as doações correspondentes
+    const alimentosComDetalhes = alimentosCampanha.map((alimentoCampanha: any) => {
+      const detalheAlimento = detalhesAlimentos.find(
+        (alimento: any) => alimento.id === alimentoCampanha.alimento_id
       );
-    
-      const qt_doacoes_campanha = campanha.alimentosCampanha.reduce(
-        (total: any, alimento: any) =>
-          total + (alimento.doacoes.length > 0 ? alimento.doacoes[0].qt_alimento_doado : 0),
-        0
+      const doacao = doacoes.find(
+        (d: any) => d.alimento_id === alimentoCampanha.alimento_id
       );
-    
+
       return {
-        ...campanha,
-        minutos_restantes: minutosRestantes,
-        horas_restantes: horasRestantes,
-        dias_restantes: diasRestantes,
-        meses_restantes: mesesRestantes,
-        anos_restantes: anosRestantes,
-        qt_total_campanha: qt_total_campanha,
-        qt_doacoes_campanha: qt_doacoes_campanha,
-        alimentos: campanha.alimentosCampanha.map((alimento: any) => ({
-          nm_alimento: alimento.alimento.nm_alimento,
-          alimento_id: alimento.alimento.id,
-          sg_medida_alimento: alimento.alimento.sg_medida_alimento,
-          qt_alimento_meta: alimento.qt_alimento_meta,
-          qt_alimento_doado: alimento.doacoes.length > 0 ? alimento.doacoes[0].qt_alimento_doado : 0,
-        })),
+        nm_alimento: detalheAlimento?.nm_alimento || null,
+        alimento_id: detalheAlimento?.id || null,
+        sg_medida_alimento: detalheAlimento?.sg_medida_alimento || null,
+        qt_alimento_meta: alimentoCampanha.qt_alimento_meta,
+        qt_alimento_doado: doacao ? doacao.qt_alimento_doado : 0,
       };
     });
-    
-    if (campanhasAgregadas.length === 0) {
-      throw new Error('Campanha não encontrada');
-    }
-    
-    return campanhasAgregadas[0];
-    
 
+    return {
+      ...campanha,
+      nm_usuario: usuario?.nm_usuario || null,
+      cd_foto_usuario: usuario?.cd_foto_usuario || null,
+      minutos_restantes: minutosRestantes,
+      horas_restantes: horasRestantes,
+      dias_restantes: diasRestantes,
+      meses_restantes: mesesRestantes,
+      anos_restantes: anosRestantes,
+      qt_total_campanha: qt_total_campanha,
+      qt_doacoes_campanha: qt_doacoes_campanha,
+      alimentos: alimentosComDetalhes,
+    };
+  }));
 
-  } else {
+  if (campanhasAgregadas.length === 0) {
+    throw new Error('Campanha não encontrada');
+  }
+
+  return campanhasAgregadas[0];
+}
+ else {
     const campanhas = await prisma.campanha.findMany({
       where: {
         dt_encerramento_campanha: {
@@ -130,7 +148,7 @@ const campanhas = async (id: string | null = null) => {
     });
     
     // Adiciona campos calculados manualmente
-    const campanhasComCamposCalculados = await Promise.all(campanhas.map(async (campanha) => {
+    const campanhasComCamposCalculados = await Promise.all(campanhas.map(async (campanha: any) => {
       const now = new Date();
       const dtEncerramento = new Date(campanha.dt_encerramento_campanha);
     
@@ -150,16 +168,20 @@ const campanhas = async (id: string | null = null) => {
       const alimentosCampanha = await prisma.alimento_campanha.findMany({
         where: { campanha_id: campanha.id },
       });
+
+      const usuarioCampanha = await prisma.usuario.findUnique({
+        where: { id: campanha.usuario_id },
+      });
     
       // Busca detalhes dos alimentos em uma consulta separada
-      const alimentosIds = alimentosCampanha.map(alimento => alimento.alimento_id); // Supondo que alimento_id exista em alimento_campanha
+      const alimentosIds = alimentosCampanha.map((alimento: { alimento_id: any; }) => alimento.alimento_id); // Supondo que alimento_id exista em alimento_campanha
       const detalhesAlimentos = await prisma.alimento.findMany({
         where: { id: { in: alimentosIds } },
       });
     
       // Mapeia os detalhes dos alimentos
       const alimentosComDetalhes = alimentosCampanha.map((alimentoCampanha:any) => {
-        const detalheAlimento = detalhesAlimentos.find(alimento => alimento.id === alimentoCampanha.alimento_id);
+        const detalheAlimento = detalhesAlimentos.find((alimento: { id: any; }) => alimento.id === alimentoCampanha.alimento_id);
         
         return {
           nm_alimento: detalheAlimento.nm_alimento,
@@ -167,13 +189,14 @@ const campanhas = async (id: string | null = null) => {
           sg_medida_alimento: detalheAlimento.sg_medida_alimento,
           qt_alimento_meta: alimentoCampanha.qt_alimento_meta,
           qt_alimento_doado: doacoes
-            .filter(doacao => doacao.campanha_id === campanha.id)
+            .filter((doacao: { campanha_id: any; }) => doacao.campanha_id === campanha.id)
             .reduce((sum:any, doacao:any) => sum + doacao.qt_alimento_doado, 0), // Soma as doações relacionadas
         };
       });
     
       return {
         ...campanha,
+        cd_foto_usuario: usuarioCampanha.cd_foto_usuario,
         minutos_restantes,
         horas_restantes,
         dias_restantes,
@@ -416,13 +439,13 @@ const insertAlimentosDoacao = async (cdCampanha: string, cdUsuario: string, alim
   
     try {
       const alimentosToInsert = alimentos_doacao.map((alimento: any) => ({
-        usuario_id: infos_doacao.usuario_id,
+        usuario_id: infos_doacao.usuario_doacao,
         alimento_id: alimento.alimento_id,
         campanha_id: cd_campanha_doacao,
         qt_alimento_doado: alimento.qt_alimento_doacao,
       }));
   
-      const response = await prisma.alimento_doacao.create({
+      const response = await prisma.alimento_doacao.createMany({
         data: alimentosToInsert
       });
 

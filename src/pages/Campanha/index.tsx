@@ -73,11 +73,11 @@ export const Campanha = () => {
     event.preventDefault();
 
     let infos_doacao = {
-      usuario_doacao: user.user._id,
+      usuario_doacao: user.user.id,
       cd_campanha_doacao: _id,
     }
 
-    console.log(infos_doacao)
+    console.log("infos_doacao: ", infos_doacao)
 
     let lengthAlimentos = campanha?.alimentos?.length || 0;
 
