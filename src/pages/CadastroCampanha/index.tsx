@@ -54,7 +54,7 @@ const Food: React.FC<FoodProps> = ({ id, delFood }) => {
     };
 
     return (
-        <div className="alimento row" id={id.toString()}>
+        <div className="alimento row" id={id}>
             <div className="tipo-input">
                 <label>Tipo</label>
                 <select className="input-form tpf" name="cd_tipo_alimento" onChange={handleChangeTipoAlimentoSelecionado}>
