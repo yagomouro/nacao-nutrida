@@ -133,9 +133,7 @@ export const Cadastro = () => {
                 fg_usuario_deletado: 0
             };
         }
-    
 
-        console.log(user_infos);
 
         const dbInsert = async () => {
             try {

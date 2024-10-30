@@ -387,13 +387,14 @@ const insertAlimentosDoacao = async (cdCampanha: string, cdUsuario: string, alim
       sg_estado_campanha: infos_campanha.sg_estado_campanha,
       ds_acao_campanha: infos_campanha.ds_acao_campanha,
       cd_imagem_campanha: infos_campanha.cd_imagem_campanha,
+      fg_campanha_ativa: infos_campanha.fg_campanha_ativa,
     };
   
     try {
       const campanhaInserida = await prisma.campanha.create({
         data: campanhaData
       });
-      const campanhaId = campanhaInserida.insertedId;
+      const campanhaId = campanhaInserida.id;
       let alimentosToInsert;
       let alimentosResponse;
       let inserted;
@@ -405,21 +406,21 @@ const insertAlimentosDoacao = async (cdCampanha: string, cdUsuario: string, alim
       if (alimentosArray.length === 1) {
         const alimento = alimentosArray[0];
         alimentosToInsert = {
-          alimento_id: alimento._id,
+          alimento_id: alimento.id,
           campanha_id: campanhaId,
           qt_alimento_meta: alimento.qt_alimento_meta,
         };
-        alimentosResponse = await prisma.alimento_campanha.create({
+        alimentosResponse = await prisma.alimento_campanha.createMay({
           data: alimentosToInsert
         });
         inserted = 1;
       } else {
-        alimentosToInsert = alimentosArray.map((alimento: { _id: any; qt_alimento_meta: any }) => ({
-          alimento_id: alimento._id,
+        alimentosToInsert = alimentosArray.map((alimento: { id: any; qt_alimento_meta: any }) => ({
+          alimento_id: alimento.id,
           campanha_id: campanhaId,
           qt_alimento_meta: alimento.qt_alimento_meta,
         }));
-        alimentosResponse = await prisma.alimento_campanha.create({
+        alimentosResponse = await prisma.alimento_campanha.createMany({
           data: alimentosToInsert
         });
         inserted = alimentosResponse.insertedCount;
@@ -461,17 +462,16 @@ const insertAlimentosDoacao = async (cdCampanha: string, cdUsuario: string, alim
         }
       
         try {
-          await prisma.campanha.updateOne(
-            { _id: cd_campanha_doacao, "alimentos.alimento_id": alimento.alimento_id },
-            {
-              $inc: {
-                "alimentos.$.qt_alimento_doado": alimento.qt_alimento_doacao,
-                qt_doacoes_campanha: alimento.qt_alimento_doacao
-              }
+          await prisma.campanha.update({
+            where: { id: cd_campanha_doacao },
+            data: {
+                qt_doacoes_campanha: {
+                    increment: alimento.qt_alimento_doacao
+                }
             }
-          );
+        });
         } catch (error) {
-          console.error(`Erro ao atualizar a campanha para o alimento ${alimento._id}:`, error);
+          
         }
       }
 
@@ -488,7 +488,6 @@ const insertAlimentosDoacao = async (cdCampanha: string, cdUsuario: string, alim
     try {
       const hashedPassword = await bcrypt.hash(userInfos.cd_senha_usuario, salt);
       userInfos.cd_senha_usuario = hashedPassword;
-      console.log("user: ", userInfos);
       const userResponse = await prisma.usuario.create({
         data: userInfos
       });

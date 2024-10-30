@@ -65,6 +65,7 @@ async function popularBanco() {
           const usuarios = [
             { 
               nm_usuario: 'Yago Silva', 
+              tipo_usuario: 'pf',
               ch_cpf_usuario: '12345678901', 
               dt_nascimento_usuario: new Date("1990-05-15"), 
               nr_celular_usuario: '11987654321', 
@@ -79,6 +80,7 @@ async function popularBanco() {
             },
             { 
               nm_usuario: 'Maria Santos', 
+              tipo_usuario: 'pf',
               ch_cpf_usuario: '98765432109', 
               dt_nascimento_usuario: new Date("1985-12-10T00:00:00Z"), 
               nr_celular_usuario: '11901234567', 
@@ -93,6 +95,7 @@ async function popularBanco() {
             },
             { 
               nm_usuario: 'Pedro Oliveira', 
+              tipo_usuario: 'pf',
               ch_cpf_usuario: '45678901234', 
               dt_nascimento_usuario: new Date("1978-08-20T00:00:00Z"), 
               nr_celular_usuario: '11955556666', 
@@ -107,6 +110,7 @@ async function popularBanco() {
             },
             { 
               nm_usuario: 'Empresa ABC Ltda', 
+              tipo_usuario: 'pj',
               ch_cnpj_usuario: '12345678901234', 
               nr_celular_usuario: '11999998888', 
               sg_estado_usuario: 'SP', 
@@ -120,6 +124,7 @@ async function popularBanco() {
             },
             { 
               nm_usuario: 'Comércio XYZ Ltda', 
+              tipo_usuario: 'pj',
               ch_cnpj_usuario: '98765432109876', 
               nr_celular_usuario: '11888887777', 
               sg_estado_usuario: 'RJ', 
@@ -134,7 +139,6 @@ async function popularBanco() {
           ];
 
           const dataNascimento = new Date('1990-05-15T00:00:00Z');
-console.log(dataNascimento); // Verifique se está retornando uma data válida
         
           // Inserindo os usuários no banco de dados com Prisma
           const usuariosResult = await prisma.usuario.createMany({

@@ -71,12 +71,15 @@ export const Campanha = () => {
 
   function handleSubmit(event: any) {
     event.preventDefault();
-
+    if (user.user.id === "") {
+      alert("Por favor, faça login");
+      return
+    }
     let infos_doacao = {
       usuario_doacao: user.user.id,
       cd_campanha_doacao: _id,
     }
-
+  
     console.log("infos_doacao: ", infos_doacao)
 
     let lengthAlimentos = campanha?.alimentos?.length || 0;
@@ -93,7 +96,7 @@ export const Campanha = () => {
       }).filter(item => item !== null)
       : [];
 
-    console.log(alimentos_doacao)
+
 
     const dbInsert = async () => {
       try {

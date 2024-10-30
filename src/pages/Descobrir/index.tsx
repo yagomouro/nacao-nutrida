@@ -10,7 +10,6 @@ import { IEstadoCidades } from '../../types/IEstadoCidade';
 
 export const Descobrir = () => {
   const [campanhas, setCampanhas] = useState<ICampanhaAlimento[]>([])
-  console.log("campanhas: ", campanhas);
   const [qtAlimentos, setQtAlimentos] = useState<number>(1)
   const [listaEstadosCidades, setListaEstadosCidades] = useState<IEstadoCidades[]>([])
   const [listaCidades, setListaCidades] = useState<string[]>([])

@@ -28,14 +28,14 @@ const Food: React.FC<FoodProps> = ({ id, delFood }) => {
     useEffect(() => {
         if (listaCategoriaAlimentos.length > 0) {
             const alimentos = listaCategoriaAlimentos.find(alimentos => alimentos.cd_tipo_alimento === 1)?.alimentos || [];
-            alimentos.sort((a, b) => a._id.localeCompare(b._id));
+            alimentos.sort((a, b) => a.id.localeCompare(b.id));
             setListaAlimentos(alimentos);
         }
     }, [listaCategoriaAlimentos]);
 
     useEffect(() => {
         if (listaAlimentos.length > 0) {
-            const alimento = listaAlimentos.find(alimentos => alimentos._id);
+            const alimento = listaAlimentos.find(alimentos => alimentos.id);
             setAlimentoSelecionado(alimento);
         }
     }, [listaAlimentos]);
@@ -43,13 +43,13 @@ const Food: React.FC<FoodProps> = ({ id, delFood }) => {
     const handleChangeTipoAlimentoSelecionado = (event: React.ChangeEvent<HTMLSelectElement>) => {
         const selectedTipo = parseInt(event.target.value);
         const alimentos = listaCategoriaAlimentos.find(alimentos => alimentos.cd_tipo_alimento === selectedTipo)?.alimentos || [];
-        alimentos.sort((a, b) => a._id.localeCompare(b._id));
+        alimentos.sort((a, b) => a.id.localeCompare(b.id));
         setListaAlimentos(alimentos);
     };
 
     const handleChangeAlimentoSelecionado = (event: React.ChangeEvent<HTMLSelectElement>) => {
         const selecteIdAlimento = event.target.value;
-        const alimento = listaAlimentos.find(alimento => alimento._id === selecteIdAlimento);
+        const alimento = listaAlimentos.find(alimento => alimento.id === selecteIdAlimento);
         setAlimentoSelecionado(alimento);
     };
 
@@ -69,10 +69,10 @@ const Food: React.FC<FoodProps> = ({ id, delFood }) => {
 
             <div className="alimento-input">
                 <label>Alimento</label>
-                <select className="input-form alimentoInput" name="_id" onChange={handleChangeAlimentoSelecionado}>
+                <select className="input-form alimentoInput" name="id" onChange={handleChangeAlimentoSelecionado}>
                     <option value="0" disabled>Selecione um alimento</option>
                     {listaAlimentos.map(alimento => (
-                        <option key={alimento._id} value={alimento._id}>
+                        <option key={alimento.id} value={alimento.id}>
                             {alimento.nm_alimento}
                         </option>
                     ))}
@@ -218,13 +218,13 @@ export const CriacaoCampanha = () => {
         }
 
         if (qtAlimentos === 1) {
-            if (!event.target._id.value || !event.target.qt_alimento_meta.value) {
+            if (!event.target.id.value || !event.target.qt_alimento_meta.value) {
                 alert("Todos os campos de alimento devem ser preenchidos");
                 return false;
             }
         } else {
             for (let i = 0; i < qtAlimentos; i++) {
-                if (!event.target._id[i].value || !event.target.qt_alimento_meta[i].value) {
+                if (!event.target.id[i].value || !event.target.qt_alimento_meta[i].value) {
                     alert("Todos os campos de alimento devem ser preenchidos");
                     return false;
                 }
@@ -238,7 +238,7 @@ export const CriacaoCampanha = () => {
         event.preventDefault();
 
         const qtAlimentos = parseInt(event.target.qt_alimentos.value);
-        console.log("qtAlimentos: ", qtAlimentos);
+
         if (!validateCampanha(event, qtAlimentos)) {
             return;
         }
@@ -251,16 +251,17 @@ export const CriacaoCampanha = () => {
             sg_estado_campanha: event.target.sg_estado_campanha.value,
             ds_acao_campanha: event.target.ds_acao_campanha.value,
             cd_imagem_campanha: event.target.cd_imagem_campanha.value || "1.png",
+            fg_campanha_ativa: new Date(event.target.dt_encerramento_campanha.value) > new Date()
         };
-        let alimentos_campanha: { _id: string; qt_alimento_meta: number }[] = [];
+        let alimentos_campanha: { id: string; qt_alimento_meta: number }[] = [];
         if (qtAlimentos === 1) {
             alimentos_campanha.push({
-              _id: event.target._id.value,
+              id: event.target.id.value,
               qt_alimento_meta: parseInt(event.target.qt_alimento_meta.value),
             });
           } else {
             alimentos_campanha = Array.from({ length: qtAlimentos }, (_, index) => ({
-              _id: event.target._id[index].value,
+              id: event.target.id[index].value,
               qt_alimento_meta: parseInt(event.target.qt_alimento_meta[index].value),
             }));
           }
