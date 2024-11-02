@@ -14,6 +14,7 @@ Bem-vindo ao Nação Nutrida! Estamos ansiosos para que você contribua para est
 ```
 Node.js >=  a versão 14.17.0
 npm >= a versão 6.14.13
+prisma >= a versão 5.20.0
 ```
 
 ### 🔧 Instalação
