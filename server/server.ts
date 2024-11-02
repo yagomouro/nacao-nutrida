@@ -2,6 +2,7 @@ import dotenv from 'dotenv';
 dotenv.config({ path: '../.env' });
 import express, { Request, Response } from 'express';
 import { fetchEstadosCidades } from './config/IbgeApi';
+import { errorMonitor } from 'events';
 const bcrypt = require('bcrypt');
 const app = express();
 
@@ -96,21 +97,33 @@ if (id) {
       0
     );
 
+    const doacoesAlimento = await prisma.alimento_doacao.findMany({
+      where: {
+        campanha_id: id,
+        alimento_id: { in: alimentosIds } ,
+      }
+    });
+
     // Mapeia os detalhes dos alimentos com as doações correspondentes
     const alimentosComDetalhes = alimentosCampanha.map((alimentoCampanha: any) => {
       const detalheAlimento = detalhesAlimentos.find(
         (alimento: any) => alimento.id === alimentoCampanha.alimento_id
       );
-      const doacao = doacoes.find(
+
+      const doacao = doacoesAlimento.filter(
         (d: any) => d.alimento_id === alimentoCampanha.alimento_id
       );
+
+      const totalDoacoes = doacao.reduce((total: number, doacao: any) => {
+        return total + doacao.qt_alimento_doado; // Assumindo que 'valor' representa o valor da doação
+      }, 0);
 
       return {
         nm_alimento: detalheAlimento?.nm_alimento || null,
         alimento_id: detalheAlimento?.id || null,
         sg_medida_alimento: detalheAlimento?.sg_medida_alimento || null,
         qt_alimento_meta: alimentoCampanha.qt_alimento_meta,
-        qt_alimento_doado: doacao ? doacao.qt_alimento_doado : 0,
+        qt_alimento_doado: doacao ? totalDoacoes : 0,
       };
     });
 
@@ -178,19 +191,33 @@ if (id) {
       const detalhesAlimentos = await prisma.alimento.findMany({
         where: { id: { in: alimentosIds } },
       });
-    
-      // Mapeia os detalhes dos alimentos
-      const alimentosComDetalhes = alimentosCampanha.map((alimentoCampanha:any) => {
-        const detalheAlimento = detalhesAlimentos.find((alimento: { id: any; }) => alimento.id === alimentoCampanha.alimento_id);
-        
+      
+      const doacoesAlimento = await prisma.alimento_doacao.findMany({
+        where: {
+          campanha_id: campanha.id,
+          alimento_id: { in: alimentosIds } ,
+        }
+      });
+  
+      // Mapeia os detalhes dos alimentos com as doações correspondentes
+      const alimentosComDetalhes = alimentosCampanha.map((alimentoCampanha: any) => {
+        const detalheAlimento = detalhesAlimentos.find(
+          (alimento: any) => alimento.id === alimentoCampanha.alimento_id
+        );
+  
+        const doacao = doacoesAlimento.filter(
+          (d: any) => d.alimento_id === alimentoCampanha.alimento_id
+        );
+  
+        const totalDoacoes = doacao.reduce((total: number, doacao: any) => {
+          return total + doacao.qt_alimento_doado; // Assumindo que 'valor' representa o valor da doação
+        }, 0);
         return {
           nm_alimento: detalheAlimento.nm_alimento,
           alimento_id: detalheAlimento.id,
           sg_medida_alimento: detalheAlimento.sg_medida_alimento,
           qt_alimento_meta: alimentoCampanha.qt_alimento_meta,
-          qt_alimento_doado: doacoes
-            .filter((doacao: { campanha_id: any; }) => doacao.campanha_id === campanha.id)
-            .reduce((sum:any, doacao:any) => sum + doacao.qt_alimento_doado, 0), // Soma as doações relacionadas
+          qt_alimento_doado: doacao ? totalDoacoes : 0,
         };
       });
     
@@ -288,7 +315,7 @@ const insertAlimentosDoacao = async (cdCampanha: string, cdUsuario: string, alim
       qt_alimento_doado: alimento.qt_alimento_doacao,
     }));
   
-    const result = await prisma.alimento_doacao.create({
+    const result = await prisma.alimento_doacao.createMany({
       data: alimentosDoacao
     });
     return result;
@@ -363,7 +390,7 @@ const insertAlimentosDoacao = async (cdCampanha: string, cdUsuario: string, alim
   });
   
   app.get('/api/alimentosDoados', async (req: Request, res: Response) => {
-    const alimentosResponse = await alimentos();
+    const alimentosResponse = await alimentosDoados();
     res.json(alimentosResponse);
   });
   
@@ -410,7 +437,7 @@ const insertAlimentosDoacao = async (cdCampanha: string, cdUsuario: string, alim
           campanha_id: campanhaId,
           qt_alimento_meta: alimento.qt_alimento_meta,
         };
-        alimentosResponse = await prisma.alimento_campanha.createMay({
+        alimentosResponse = await prisma.alimento_campanha.createMany({
           data: alimentosToInsert
         });
         inserted = 1;
@@ -436,16 +463,19 @@ const insertAlimentosDoacao = async (cdCampanha: string, cdUsuario: string, alim
   
   app.post('/api/doacoes', async (req: Request, res: Response) => {
     const { infos_doacao, alimentos_doacao } = req.body;
-    const { cd_usuario_doacao, cd_campanha_doacao } = infos_doacao;
-  
+    if (!alimentos_doacao || (Array.isArray(alimentos_doacao) && alimentos_doacao.length === 0)) {
+      console.log("Doação vazia.");
+      return;
+    }
     try {
       const alimentosToInsert = alimentos_doacao.map((alimento: any) => ({
         usuario_id: infos_doacao.usuario_doacao,
         alimento_id: alimento.alimento_id,
-        campanha_id: cd_campanha_doacao,
+        campanha_id: infos_doacao.cd_campanha_doacao,
         qt_alimento_doado: alimento.qt_alimento_doacao,
       }));
   
+      
       const response = await prisma.alimento_doacao.createMany({
         data: alimentosToInsert
       });
@@ -461,18 +491,7 @@ const insertAlimentosDoacao = async (cdCampanha: string, cdUsuario: string, alim
           continue; // Ignora doações com quantidade inválida
         }
       
-        try {
-          await prisma.campanha.update({
-            where: { id: cd_campanha_doacao },
-            data: {
-                qt_doacoes_campanha: {
-                    increment: alimento.qt_alimento_doacao
-                }
-            }
-        });
-        } catch (error) {
-          
-        }
+        
       }
 
       res.json({ insertedCount: response.insertedCount });

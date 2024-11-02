@@ -24,7 +24,7 @@ export const Campanha = () => {
 
       let campanhaData = response.data;
       campanhaData.alimentos = Array.isArray(campanhaData.alimentos) ? campanhaData.alimentos : [campanhaData.alimentos];
-
+      console.log("campanhaData: ", campanhaData)
       setCampanha(campanhaData)
     }).catch((err) => {
       console.log('Error: ' + err)
@@ -95,6 +95,11 @@ export const Campanha = () => {
       return null;
       }).filter(item => item !== null)
       : [];
+
+      if (!alimentos_doacao || (Array.isArray(alimentos_doacao) && alimentos_doacao.length === 0)) {
+        alert("Doação vazia.");
+        return;
+      }
 
 
 
