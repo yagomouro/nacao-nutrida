@@ -33,4 +33,8 @@
     --border-green: 0.15rem solid var(--green-accept);
     --border-black: 0.15rem solid var(--black-logo);
     --border-shadow: 0.2rem 0.2rem 1rem rgba(0, 0, 0, 0.15);
+
+    /* Variáveis adicionais para responsividade */
+    --mobile-padding: 16px; // Padding para dispositivos móveis
+    --mobile-font-size: 14px; // Tamanho de fonte para dispositivos móveis
 }
