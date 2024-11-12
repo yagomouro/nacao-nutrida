@@ -39,14 +39,12 @@ export const Descobrir = () => {
 
   const handleChangeEstadoSelecionado = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedEstado = event.target.value;
-
     const estado = listaEstadosCidades.find(estado => estado.sg_estado === selectedEstado)!.cidades;
     setListaCidades(estado);
   };
 
   const handleChangeCidadeSelecionada = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectCidade = event.target.value;
-
     const cidade = listaCidades.find(cidade => cidade === selectCidade)!;
     setCidadeSelecionada(cidade);
   };
@@ -113,10 +111,9 @@ export const Descobrir = () => {
 
         <div className="campanhas-container column">
           <h1 className="titulo black">Campanhas mais recentes</h1>
-
           <div className="campanhas row">
             {campanhas.map((campanha) => (
-              <Link key={campanha.cd_campanha} className="campanha-link" to={`/campanhas/${campanha.cd_campanha}`}>
+              <Link key={campanha.id} className="campanha-link" to={`/campanhas/${campanha.id}`}>
                 <div className="campanha">
                   <div className="imagem-campanha">
                     <img src={`/assets/campanhas/${campanha.cd_imagem_campanha}`} alt="" />
@@ -141,12 +138,12 @@ export const Descobrir = () => {
                     <div className="progresso-container column">
                       <div className="porcentagem">
                         <div className="progresso-barra">
-                          <div style={{ width: contarProgresso(campanha.qt_doacoes_campanha, campanha.qt_total_campanha) }} className={`progresso-atual progresso-atual-${campanha.cd_campanha}`}></div>
+                          <div style={{ width: contarProgresso(campanha.qt_doacoes_campanha, campanha.qt_total_campanha) }} className={`progresso-atual progresso-atual-${campanha.id}`}></div>
                         </div>
                       </div>
                       <div className="arrecadado">
                         <p>
-                          <span className={`arrecadado-${campanha.cd_campanha}`}>{contarProgresso(campanha.qt_doacoes_campanha, campanha.qt_total_campanha)}</span> arrecadado
+                          <span className={`arrecadado-${campanha.id}`}>{contarProgresso(campanha.qt_doacoes_campanha, campanha.qt_total_campanha)}</span> arrecadado
                         </p>
                       </div>
                     </div>
