@@ -90,7 +90,7 @@ export const Cadastro = () => {
 
         return true;
     };
-
+    let user_infos = {}
     const handleSubmit = (event: any) => {
         event.preventDefault();
 
@@ -100,19 +100,40 @@ export const Cadastro = () => {
             return;
         }
 
-        const user_infos = {
-            tipo_usuario: tipo_usuario,
-            nm_usuario: nm_usuario,
-            ch_documento_usuario: ch_documento_usuario,
-            cd_email_usuario: cd_email_usuario,
-            nr_celular_usuario: nr_celular_usuario,
-            dt_nascimento_usuario: tipo_usuario === 'pf' ? dt_nascimento_usuario : undefined,
-            cd_senha_usuario: cd_senha_usuario,
-            sg_estado_usuario: sg_estado_usuario,
-            nm_cidade_usuario: nm_cidade_usuario
-        };
+        if(tipo_usuario === "pf"){
+            user_infos = {
+                tipo_usuario: tipo_usuario,
+                nm_usuario: nm_usuario,
+                ch_cpf_usuario: ch_documento_usuario,
+                cd_email_usuario: cd_email_usuario,
+                nr_celular_usuario: nr_celular_usuario,
+                dt_nascimento_usuario: new Date(dt_nascimento_usuario),
+                cd_senha_usuario: cd_senha_usuario,
+                sg_estado_usuario: sg_estado_usuario,
+                nm_cidade_usuario: nm_cidade_usuario,
+                cd_foto_usuario: "default.png",
+                fg_admin: 0,
+                qt_advertencias_usuario: 0,
+                fg_usuario_deletado: 0
+            };
+        }
+        else {
+            user_infos = {
+                tipo_usuario: tipo_usuario,
+                nm_usuario: nm_usuario,
+                ch_cnpj_usuario: ch_documento_usuario,
+                cd_email_usuario: cd_email_usuario,
+                nr_celular_usuario: nr_celular_usuario,
+                cd_senha_usuario: cd_senha_usuario,
+                sg_estado_usuario: sg_estado_usuario,
+                nm_cidade_usuario: nm_cidade_usuario,
+                cd_foto_usuario: "default.png",
+                fg_admin: 0,
+                qt_advertencias_usuario: 0,
+                fg_usuario_deletado: 0
+            };
+        }
 
-        console.log(user_infos);
 
         const dbInsert = async () => {
             try {

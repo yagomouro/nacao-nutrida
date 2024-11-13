@@ -1,6 +1,6 @@
 [
     {
-        "cd_campanha": "1",
+        "_id": "1",
         "nm_titulo_campanha": "Campanha de combate à fome",
         "alimentos": [
             {
@@ -36,7 +36,7 @@
         "sg_estado_campanha": "SP"
     },
     {
-        "cd_campanha": "2",
+        "_id": "2",
         "nm_titulo_campanha": "Campanha de combate à fome",
         "alimentos": [
             {
@@ -72,7 +72,7 @@
         "sg_estado_campanha": "SP"
     },
     {
-        "cd_campanha": "3",
+        "_id": "3",
         "nm_titulo_campanha": "Campanha de combate à fome",
         "alimentos": [
             {
@@ -108,7 +108,7 @@
         "sg_estado_campanha": "SP"
     },
     {
-        "cd_campanha": "4",
+        "_id": "4",
         "nm_titulo_campanha": "Campanha de combate à fome",
         "alimentos": [
             {
@@ -144,7 +144,7 @@
         "sg_estado_campanha": "SP"
     },
     {
-        "cd_campanha": "5",
+        "_id": "5",
         "nm_titulo_campanha": "Campanha de combate à fome",
         "alimentos": [
             {
@@ -180,7 +180,7 @@
         "sg_estado_campanha": "SP"
     },
     {
-        "cd_campanha": "6",
+        "_id": "6",
         "nm_titulo_campanha": "Campanha de combate à fome",
         "alimentos": [
             {
@@ -216,7 +216,7 @@
         "sg_estado_campanha": "SP"
     },
     {
-        "cd_campanha": "7",
+        "_id": "7",
         "nm_titulo_campanha": "Campanha de combate à fome",
         "alimentos": [
             {
@@ -252,7 +252,7 @@
         "sg_estado_campanha": "SP"
     },
     {
-        "cd_campanha": "8",
+        "_id": "8",
         "nm_titulo_campanha": "Campanha de combate à fome",
         "alimentos": [
             {
@@ -288,7 +288,7 @@
         "sg_estado_campanha": "SP"
     },
     {
-        "cd_campanha": "9",
+        "_id": "9",
         "nm_titulo_campanha": "Campanha de combate à fome",
         "alimentos": [
             {

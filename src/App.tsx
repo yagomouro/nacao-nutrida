@@ -22,7 +22,7 @@ function App() {
             <Route path='/login' element={<Login />} />
             <Route path='/cadastro' element={<Cadastro />} />
             <Route path='/descobrir' element={<Descobrir />} />
-            <Route path='/campanhas/:cd_campanha' element={<Campanha />} />
+            <Route path='/campanhas/:_id' element={<Campanha />} />
             <Route path='/campanhas/criar' element={<CriacaoCampanha />} />
             <Route path='*' element={<NotFound />} />
           </Routes>

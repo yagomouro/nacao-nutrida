@@ -10,7 +10,7 @@ import { IEstadoCidades } from '../../types/IEstadoCidade';
 import { UserContext } from '../../contexts/userContext';
 
 interface FoodProps {
-    id: number;
+    id: any;
     delFood: () => void;
 }
 
@@ -28,14 +28,14 @@ const Food: React.FC<FoodProps> = ({ id, delFood }) => {
     useEffect(() => {
         if (listaCategoriaAlimentos.length > 0) {
             const alimentos = listaCategoriaAlimentos.find(alimentos => alimentos.cd_tipo_alimento === 1)?.alimentos || [];
-            alimentos.sort((a, b) => a.cd_alimento - b.cd_alimento);
+            alimentos.sort((a, b) => a.id.localeCompare(b.id));
             setListaAlimentos(alimentos);
         }
     }, [listaCategoriaAlimentos]);
 
     useEffect(() => {
         if (listaAlimentos.length > 0) {
-            const alimento = listaAlimentos.find(alimentos => alimentos.cd_alimento === 1);
+            const alimento = listaAlimentos.find(alimentos => alimentos.id);
             setAlimentoSelecionado(alimento);
         }
     }, [listaAlimentos]);
@@ -43,18 +43,18 @@ const Food: React.FC<FoodProps> = ({ id, delFood }) => {
     const handleChangeTipoAlimentoSelecionado = (event: React.ChangeEvent<HTMLSelectElement>) => {
         const selectedTipo = parseInt(event.target.value);
         const alimentos = listaCategoriaAlimentos.find(alimentos => alimentos.cd_tipo_alimento === selectedTipo)?.alimentos || [];
-        alimentos.sort((a, b) => a.cd_alimento - b.cd_alimento);
+        alimentos.sort((a, b) => a.id.localeCompare(b.id));
         setListaAlimentos(alimentos);
     };
 
     const handleChangeAlimentoSelecionado = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        const selecteIdAlimento = parseInt(event.target.value);
-        const alimento = listaAlimentos.find(alimento => alimento.cd_alimento === selecteIdAlimento);
+        const selecteIdAlimento = event.target.value;
+        const alimento = listaAlimentos.find(alimento => alimento.id === selecteIdAlimento);
         setAlimentoSelecionado(alimento);
     };
 
     return (
-        <div className="alimento row" id={id.toString()}>
+        <div className="alimento row" id={id}>
             <div className="tipo-input">
                 <label>Tipo</label>
                 <select className="input-form tpf" name="cd_tipo_alimento" onChange={handleChangeTipoAlimentoSelecionado}>
@@ -69,10 +69,10 @@ const Food: React.FC<FoodProps> = ({ id, delFood }) => {
 
             <div className="alimento-input">
                 <label>Alimento</label>
-                <select className="input-form alimentoInput" name="cd_alimento" onChange={handleChangeAlimentoSelecionado}>
+                <select className="input-form alimentoInput" name="id" onChange={handleChangeAlimentoSelecionado}>
                     <option value="0" disabled>Selecione um alimento</option>
                     {listaAlimentos.map(alimento => (
-                        <option key={alimento.cd_alimento} value={alimento.cd_alimento}>
+                        <option key={alimento.id} value={alimento.id}>
                             {alimento.nm_alimento}
                         </option>
                     ))}
@@ -217,13 +217,20 @@ export const CriacaoCampanha = () => {
             return false;
         }
 
-        for (let i = 0; i < qtAlimentos; i++) {
-            if (!event.target.cd_alimento[i].value || !event.target.qt_alimento_meta[i].value) {
+        if (qtAlimentos === 1) {
+            if (!event.target.id.value || !event.target.qt_alimento_meta.value) {
                 alert("Todos os campos de alimento devem ser preenchidos");
                 return false;
             }
+        } else {
+            for (let i = 0; i < qtAlimentos; i++) {
+                if (!event.target.id[i].value || !event.target.qt_alimento_meta[i].value) {
+                    alert("Todos os campos de alimento devem ser preenchidos");
+                    return false;
+                }
+            }
         }
-
+    
         return true;
     };
 
@@ -237,19 +244,27 @@ export const CriacaoCampanha = () => {
         }
 
         const infos_campanha = {
-            cd_usuario_campanha: user.user.cd_usuario,
+            usuario_id: user.user.id,
             nm_titulo_campanha: event.target.nm_titulo_campanha.value,
             dt_encerramento_campanha: event.target.dt_encerramento_campanha.value,
             nm_cidade_campanha: event.target.nm_cidade_campanha.value,
             sg_estado_campanha: event.target.sg_estado_campanha.value,
             ds_acao_campanha: event.target.ds_acao_campanha.value,
-            cd_imagem_campanha: event.target.ds_acao_campanha.value,
+            cd_imagem_campanha: event.target.cd_imagem_campanha.value || "1.png",
+            fg_campanha_ativa: new Date(event.target.dt_encerramento_campanha.value) > new Date()
         };
-
-        const alimentos_campanha = Array.from({ length: qtAlimentos }, (_, index) => ({
-            cd_alimento: parseInt(event.target.cd_alimento[index].value),
-            qt_alimento_meta: parseInt(event.target.qt_alimento_meta[index].value),
-        }));
+        let alimentos_campanha: { id: string; qt_alimento_meta: number }[] = [];
+        if (qtAlimentos === 1) {
+            alimentos_campanha.push({
+              id: event.target.id.value,
+              qt_alimento_meta: parseInt(event.target.qt_alimento_meta.value),
+            });
+          } else {
+            alimentos_campanha = Array.from({ length: qtAlimentos }, (_, index) => ({
+              id: event.target.id[index].value,
+              qt_alimento_meta: parseInt(event.target.qt_alimento_meta[index].value),
+            }));
+          }
 
         const dbInsert = async () => {
             try {
@@ -341,10 +356,10 @@ export const CriacaoCampanha = () => {
                         <h2 className="sub titulo">Alimentos</h2>
                         <div className="alimentos-container">
                             <div className="alimentos-wrapper column">
-                                {Array.from({ length: qtAlimentos }, (_, index) => (
+                                    {Array.from({ length: qtAlimentos }, (_, index) => (
                                     <Food key={index + 1} id={index + 1} delFood={delFood} />
                                 ))}
-                            </div>
+                                </div>
                             <input type="text" hidden name="qt_alimentos" value={qtAlimentos} />
 
                             <button className="btn blue-light2 adicionar" type="button" onClick={addFood}>
