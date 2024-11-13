@@ -1,5 +1,4 @@
 /* Configuração geral */
-
 .btn {
     width: max-content;
     height: max-content;
@@ -40,7 +39,6 @@
 
 .btn.red-denounce {
     background-color: var(--red-denounce);
-
     color: var(--white);
 }
 
@@ -59,7 +57,6 @@
 .btn.green {
     background-color: var(--green-accept);
     color: var(--white);
-
     font-weight: bold;
 }
 
@@ -81,4 +78,13 @@
 .btn.green-concluded {
     background-color: var(--green-concluded);
     color: var(--white);
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .btn {
+        min-width: 100%; // Ajusta a largura do botão para 100%
+        font-size: 1.5rem; // Ajusta o tamanho da fonte
+        padding: 0.5rem 1rem; // Reduz o espaçamento interno
+    }
 }
