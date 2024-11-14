@@ -19,7 +19,7 @@ prisma >= a versão 5.20.0
 
 ### 🔧 Instalação
 
-1. Instale as dependências do projeto:
+1. Na pasta raiz, instale as dependências do projeto:
 ```
 npm install
 ```
@@ -34,9 +34,13 @@ Exemplo:
 DATABASE_URL="mongodb+srv://<Seu_Usuario>:<Sua_Senha>@cluster0.nql6p.mongodb.net/nacao-nutrida"
 ```
 
-3. Execute o script para configurar o banco de dados:
+3. Na pasta raiz, gere o cliente prisma:
 ```
-cd database
+npx prisma generate
+```
+
+4. Na pasta database, execute o script para configurar o banco de dados:
+```
 node popularBanco.js
 ```
 
